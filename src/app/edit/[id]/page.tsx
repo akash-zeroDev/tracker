@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Copy } from "lucide-react";
 import { TrackerSync } from "@/components/TrackerSync";
 import { EmailBackupCard } from "@/components/EmailBackupCard";
+import { ClientLogForm } from "@/components/ClientLogForm";
 
 export default async function EditGoalPage(props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
@@ -45,20 +46,7 @@ export default async function EditGoalPage(props: { params: Promise<{ id: string
 
       <section className="w-full space-y-4">
         <h2 className="text-xl font-semibold">Log Today&apos;s Progress</h2>
-        <form action={async (formData) => {
-          "use server";
-          const content = formData.get("content") as string;
-          await addLogEntry(goal.id, content);
-        }} className="space-y-4">
-          <textarea
-            name="content"
-            placeholder="What did you learn today? (Optional)"
-            className="w-full h-32 bg-white/5 border border-white/10 rounded-xl p-4 text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-blue-500/50 resize-none"
-          />
-          <div className="flex justify-end">
-            <Button type="submit" variant="primary">Save Log</Button>
-          </div>
-        </form>
+        <ClientLogForm goalId={goal.id} />
       </section>
 
       <section className="w-full space-y-4">

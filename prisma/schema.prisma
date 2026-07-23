@@ -12,15 +12,17 @@ model Goal {
   id            String      @id @default(uuid())
   publicSlug    String      @unique
   title         String
-  createdAt     DateTime    @default(now())
-  currentStreak Int         @default(0)
-  entries       LogEntry[]
+  createdAt       DateTime    @default(now())
+  currentStreak   Int         @default(0)
+  longestStreak   Int         @default(0)
+  lastLogDateText String?
+  entries         LogEntry[]
 }
 
 model LogEntry {
   id        String   @id @default(uuid())
   goalId    String
-  goal      Goal     @relation(fields: [goalId], references: [id])
+  goal      Goal     @relation(fields: [goalId], references: [id], onDelete: Cascade)
   content   String?
   createdAt DateTime @default(now())
 }
