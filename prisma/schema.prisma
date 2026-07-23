@@ -1,0 +1,26 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Goal {
+  id            String      @id @default(uuid())
+  publicSlug    String      @unique
+  title         String
+  createdAt     DateTime    @default(now())
+  currentStreak Int         @default(0)
+  entries       LogEntry[]
+}
+
+model LogEntry {
+  id        String   @id @default(uuid())
+  goalId    String
+  goal      Goal     @relation(fields: [goalId], references: [id])
+  content   String?
+  createdAt DateTime @default(now())
+}
