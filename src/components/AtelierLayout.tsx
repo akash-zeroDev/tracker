@@ -34,8 +34,7 @@ export function TopIndex() {
     { label: "Desk", active: pathname === "/", href: "/" },
     { label: "Community", active: pathname === "/community", href: "/community" },
     { label: "Entries", active: pathname === "/entries", href: "/entries" },
-    { label: "Goals", active: false },
-    { label: "Archive", active: false },
+    { label: "Archive", active: pathname === "/archive", href: "/archive" },
   ];
   return (
     <header className="border-b border-[color:var(--color-rule)] bg-[color:var(--color-paper)]/70 backdrop-blur-[1px]">

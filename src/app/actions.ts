@@ -201,6 +201,16 @@ export async function getRecentGoals(limit: number = 3) {
   });
 }
 
+export async function getArchivedGoals() {
+  return await prisma.goal.findMany({
+    where: { status: 'ARCHIVED' },
+    orderBy: { createdAt: 'desc' },
+    include: {
+      entries: true
+    }
+  });
+}
+
 export async function getCommunityFeed(limit: number = 3) {
   return await prisma.goal.findMany({
     orderBy: { createdAt: 'desc' },
