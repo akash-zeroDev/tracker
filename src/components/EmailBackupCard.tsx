@@ -1,81 +1,91 @@
-"use client";
+'use client';
 
-import React, { useState, useEffect } from "react";
-import { Button } from "./ui/Button";
-import { Mail, Check, AlertCircle } from "lucide-react";
-import { sendBackupEmail } from "@/app/actions";
+import React, { useState, useEffect, useTransition } from 'react';
+import { Button } from '@/components/ui/Button';
+import { Input, FieldGroup, ValidationMessage } from '@/components/ui/forms';
+import { sendBackupEmail } from '@/app/actions';
+import { Check } from 'lucide-react';
 
 export function EmailBackupCard({ editUrl }: { editUrl: string }) {
-  const [email, setEmail] = useState("");
-  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [email, setEmail] = useState('');
+  const [isPending, startTransition] = useTransition();
+  const [error, setError] = useState<string | undefined>();
+  const [isVaulted, setIsVaulted] = useState(false);
 
-  // Load previous email from localStorage if they've used this feature before
   useEffect(() => {
-    const savedEmail = localStorage.getItem("backup_email_v1");
+    const savedEmail = localStorage.getItem('backup_email_v1');
     if (savedEmail) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setEmail(savedEmail);
     }
   }, []);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !email.includes("@")) return;
-
-    setStatus("loading");
-    try {
-      // Save locally for convenience, NEVER send to Supabase
-      localStorage.setItem("backup_email_v1", email);
-      
-      const fullUrl = `${window.location.origin}${editUrl}`;
-      await sendBackupEmail(email, fullUrl);
-      
-      setStatus("success");
-      setTimeout(() => setStatus("idle"), 5000);
-    } catch (err) {
-      console.error(err);
-      setStatus("error");
+    setError(undefined);
+    if (!email || !email.includes('@')) {
+      setError('Please enter a valid email address.');
+      return;
     }
+
+    startTransition(async () => {
+      try {
+        localStorage.setItem('backup_email_v1', email);
+        const fullUrl = `${window.location.origin}${editUrl}`;
+        await sendBackupEmail(email, fullUrl);
+        setIsVaulted(true);
+      } catch (err) {
+        console.error(err);
+        setError('Failed to vault tracker.');
+      }
+    });
   };
 
-  return (
-    <div className="glass-panel p-5 space-y-4 relative overflow-hidden border border-blue-500/20">
-      <div className="absolute top-0 left-0 w-1 h-full bg-blue-500/50" />
-      
-      <div className="flex items-start gap-3">
-        <div className="w-8 h-8 rounded-full bg-blue-500/10 flex items-center justify-center shrink-0 mt-0.5">
-          <Mail className="w-4 h-4 text-blue-400" />
+  if (isVaulted) {
+    return (
+      <div className="flex items-center justify-between w-full">
+        <div className="flex items-center gap-2 text-sm text-[var(--color-catalyst-cyan)] font-medium">
+          <Check className="h-4 w-4" />
+          <span>Vaulted securely to {email}</span>
         </div>
-        <div>
-          <h3 className="font-semibold">Never lose this tracker</h3>
-          <p className="text-xs text-white/60 mt-1">
-            Want cross-device access? Send a one-time backup link to your inbox.
-          </p>
-        </div>
-      </div>
-
-      <form onSubmit={handleSubmit} className="flex gap-2">
-        <input
-          type="email"
-          required
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="your@email.com"
-          className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
-        />
-        <Button 
-          type="submit" 
-          disabled={status === "loading" || status === "success"}
-          variant="secondary"
-          className="text-sm px-4"
+        <button 
+          onClick={() => setIsVaulted(false)}
+          className="text-xs uppercase tracking-widest opacity-50 hover:opacity-100 hover:text-[var(--color-catalyst-cyan)] transition-colors"
         >
-          {status === "loading" ? "Sending..." : status === "success" ? <Check className="w-4 h-4" /> : "Send"}
-        </Button>
-      </form>
-
-      <div className="flex items-center gap-1.5 text-[10px] text-white/40 pt-1">
-        <AlertCircle className="w-3 h-3" />
-        <p>Fire-and-forget: Your email is saved to this browser only. We <strong className="text-white/60">never</strong> store it in our database.</p>
+          UPDATE EMAIL
+        </button>
       </div>
-    </div>
+    );
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="w-full">
+      <FieldGroup>
+        <div className="flex flex-col sm:flex-row gap-2">
+          <Input
+            type="email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="your@email.com"
+            disabled={isPending}
+            aria-invalid={!!error}
+            className={`flex-1 ${error ? 'border-[var(--color-critical)] focus:border-[var(--color-critical)]' : ''}`}
+          />
+          <Button
+            type="submit"
+            variant="secondary"
+            isLoading={isPending}
+            className="w-full sm:w-auto"
+          >
+            VAULT
+          </Button>
+        </div>
+        <ValidationMessage 
+          error={error || (isPending ? '' : undefined)} 
+          helpText={error ? "Vault delivery failed. Verify email format or retry." : "Architecture relies on local coordinates. To prevent permanent loss, secure this URL to an external vault."} 
+        />
+      </FieldGroup>
+    </form>
   );
 }

@@ -1,76 +1,70 @@
-"use client";
-
-import React from "react";
-import { OmniInput } from "@/components/ui/OmniInput";
-import { RecentTrackers } from "@/components/RecentTrackers";
-import { ArrowUpRight, BarChart2, Zap } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { createGoal } from "@/app/actions";
+import React from 'react';
+import { OriginForm } from '@/components/OriginForm';
+import { 
+  Label, 
+  RefId, 
+  MarginNote, 
+  ReferenceSnippet, 
+  ComponentAtlas
+} from '@/components/AtelierPrimitives';
+import { ClientTrackerNote } from '@/components/ClientTrackerNote';
+import { ActiveFoliosList } from '@/components/ActiveFoliosList';
 
 export default function Home() {
-  const router = useRouter();
-
-  const handleCreateGoal = async (value: string) => {
-    try {
-      const goal = await createGoal(value);
-      router.push(`/edit/${goal.id}`);
-    } catch (error) {
-      console.error("Failed to create goal", error);
-    }
-  };
-
   return (
-    <main className="flex-1 flex flex-col items-center justify-center p-6 sm:p-12 md:p-24 w-full max-w-5xl mx-auto space-y-32">
+    <main className="min-h-screen text-[color:var(--color-ink)]">
+      <section className="relative overflow-hidden">
+        <div className="mx-auto max-w-[1180px] px-8 pt-20 pb-32">
+          {/* Overline */}
+          <div className="flex flex-wrap items-center justify-between gap-4 reveal">
+            <Label>Working board · Fig. 01</Label>
+            <RefId className="opacity-80">a quiet workspace for public learning</RefId>
+          </div>
+
+          {/* Composition grid */}
+          <div className="mt-10 grid grid-cols-12 gap-8">
+            {/* Left: pinned objective — the hero object of the section */}
+            <article className="paper-sheet paper-lift relative col-span-12 lg:col-span-8 p-12 md:p-14 reveal reveal-delay-1">
+              <span className="paper-clip -top-4 left-14" />
+              <div className="flex items-start justify-between">
+                <RefId>№ 004 · OBJECTIVE</RefId>
+              </div>
+
+              <h2 className="mt-12 font-serif text-[3.8rem] md:text-[5rem] leading-[0.98] tracking-[-0.02em]">
+                A place to <span className="italic">think slowly</span>,
+                <br />
+                in <span className="italic">public</span>, for years.
+              </h2>
+
+              <p className="mt-10 max-w-[54ch] font-serif text-[1.06rem] leading-[1.75] text-[color:var(--color-ink-soft)]">
+                Sync is a Learn-in-Public workspace shaped like an atelier —
+                not a dashboard. Declare a{" "}
+                <a className="ink-link">Learning Goal</a>, file a{" "}
+                <a className="ink-link">Daily Entry</a>, tend your{" "}
+                <a className="ink-link">Streak</a>, and — when a body of work
+                has settled — share a <a className="ink-link">Public Link</a>{" "}
+                to your archive.
+              </p>
+
+              {/* Functional CTA: Origin Form embedded directly into the layout */}
+              <div className="mt-14">
+                <Label>Begin a folio</Label>
+                <div className="mt-4">
+                  <OriginForm />
+                </div>
+              </div>
+            </article>
+
+            {/* Right column: static decorative note + active folios */}
+            <aside className="col-span-12 lg:col-span-4 flex flex-col gap-8 reveal reveal-delay-2">
+              <ClientTrackerNote />
+              <ActiveFoliosList />
+            </aside>
+          </div>
+        </div>
+      </section>
       
-      {/* Hero Section */}
-      <section className="w-full flex flex-col items-center justify-center space-y-8 text-center pt-20">
-        <div className="space-y-4">
-          <h1 className="text-5xl md:text-7xl font-bold tracking-tight glow-text">
-            Learn in Public. <br className="hidden md:block" />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">
-              Zero Friction.
-            </span>
-          </h1>
-          <p className="text-lg md:text-xl text-white/60 max-w-2xl mx-auto font-mono">
-            Log your daily progress, build a streak, and share your journey without ever signing up.
-          </p>
-        </div>
-
-        <div className="w-full pt-8">
-          <OmniInput onSubmitAction={handleCreateGoal} />
-        </div>
-      </section>
-
-      {/* Recent Trackers (Local Storage) */}
-      <RecentTrackers />
-
-      {/* Interactive Preview / How it works */}
-      <section className="w-full grid md:grid-cols-3 gap-6">
-        <div className="glass-panel p-6 space-y-4">
-          <div className="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center">
-            <Zap className="w-5 h-5 text-blue-400" />
-          </div>
-          <h3 className="text-xl font-semibold">1. Set a Goal</h3>
-          <p className="text-white/60 text-sm">Enter what you are learning right now. No email, no password.</p>
-        </div>
-        
-        <div className="glass-panel p-6 space-y-4">
-          <div className="w-10 h-10 rounded-lg bg-purple-500/20 flex items-center justify-center">
-            <BarChart2 className="w-5 h-5 text-purple-400" />
-          </div>
-          <h3 className="text-xl font-semibold">2. Build a Streak</h3>
-          <p className="text-white/60 text-sm">Log your daily progress and watch your activity heatmap light up.</p>
-        </div>
-        
-        <div className="glass-panel p-6 space-y-4">
-          <div className="w-10 h-10 rounded-lg bg-pink-500/20 flex items-center justify-center">
-            <ArrowUpRight className="w-5 h-5 text-pink-400" />
-          </div>
-          <h3 className="text-xl font-semibold">3. Share the Proof</h3>
-          <p className="text-white/60 text-sm">Get a secret link to update, and a public link to share on socials.</p>
-        </div>
-      </section>
-
+      <ComponentAtlas />
     </main>
   );
 }

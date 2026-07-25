@@ -19,10 +19,11 @@ export function useTrackers() {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setTrackers(JSON.parse(stored));
       }
-    } catch (e) {
-      console.error('Failed to load trackers from localStorage', e);
+    } catch {
+      console.error('Failed to load trackers from localStorage');
     }
     setIsLoaded(true);
   }, []);
@@ -38,7 +39,7 @@ export function useTrackers() {
     setTrackers((prev) => {
       const existingIndex = prev.findIndex((t) => t.id === tracker.id);
       const now = Date.now();
-      
+
       if (existingIndex >= 0) {
         // Update existing
         const updated = [...prev];

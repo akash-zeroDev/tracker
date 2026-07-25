@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useEffect } from "react";
-import { useTrackers } from "@/hooks/useTrackers";
+import { useEffect } from 'react';
+import { useTrackers } from '@/hooks/useTrackers';
 
 interface TrackerSyncProps {
   id: string;
