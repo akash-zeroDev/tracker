@@ -1,0 +1,105 @@
+@media (prefers-reduced-motion: no-preference) {
+  
+  /* Ink Settling Keyframes */
+  @keyframes inkSettleHeadings {
+    0% {
+      opacity: 0.75;
+      filter: blur(0.6px);
+      transform: translateZ(0); /* Force GPU acceleration */
+    }
+    100% {
+      opacity: 1;
+      filter: blur(0px);
+      transform: translateZ(0);
+    }
+  }
+
+  @keyframes inkSettleBody {
+    0% {
+      opacity: 0.5;
+      filter: blur(1.2px);
+      transform: translateZ(0);
+    }
+    100% {
+      opacity: 1;
+      filter: blur(0px);
+      transform: translateZ(0);
+    }
+  }
+
+  @keyframes inkSettleMetadata {
+    0% {
+      opacity: 0.1;
+      filter: blur(2px);
+      transform: translateZ(0);
+    }
+    100% {
+      opacity: 1;
+      filter: blur(0px);
+      transform: translateZ(0);
+    }
+  }
+
+  @keyframes inkSettleRules {
+    0% {
+      opacity: 0;
+      transform: translateZ(0);
+    }
+    100% {
+      opacity: 1;
+      transform: translateZ(0);
+    }
+  }
+  
+  @keyframes inkNoiseFade {
+    0% {
+      opacity: 0.25;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+
+  /* Applying the staggering to the DOM */
+  .fresh-print h1, 
+  .fresh-print h2, 
+  .fresh-print h3 {
+    animation: inkSettleHeadings 2000ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+
+  .fresh-print p, 
+  .fresh-print li, 
+  .fresh-print blockquote {
+    animation: inkSettleBody 3000ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+
+  .fresh-print span, 
+  .fresh-print a,
+  .fresh-print .label-caps, 
+  .fresh-print .ref-id {
+    animation: inkSettleMetadata 4000ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+
+  .fresh-print hr, 
+  .fresh-print svg,
+  .fresh-print [class*="border"],
+  .fresh-print [class*="bg-"] {
+    /* Exclude the paper background from settling */
+    animation: inkSettleRules 4500ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+  
+  /* Ensure the background color doesn't flicker during animation */
+  .fresh-print.bg-\[color\:var\(--color-paper\)\] {
+    animation: none;
+  }
+
+  /* Noise Overlay */
+  .ink-noise-overlay {
+    pointer-events: none;
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    mix-blend-mode: multiply;
+    animation: inkNoiseFade 4000ms cubic-bezier(0.33, 1, 0.68, 1) forwards;
+  }
+}

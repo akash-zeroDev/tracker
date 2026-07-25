@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import { TopIndex, Colophon } from '@/components/AtelierLayout';
 import { Inter_Tight, Fraunces, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
+import '@/styles/ink-transition.css';
+import { InkTransition } from '@/components/transitions/InkTransition';
 
 const inter = Inter_Tight({ subsets: ['latin'], variable: '--font-sans' });
 const fraunces = Fraunces({ subsets: ['latin'], variable: '--font-serif', axes: ['SOFT', 'WONK'] });
@@ -39,7 +41,9 @@ export default function RootLayout({
       >
         <div className="relative z-10 flex min-h-screen flex-col">
           <TopIndex />
-          {children}
+          <InkTransition>
+            {children}
+          </InkTransition>
           <Colophon />
         </div>
       </body>
