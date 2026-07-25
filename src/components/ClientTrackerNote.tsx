@@ -11,6 +11,19 @@ type GoalData = {
   entries: { id: string; content: string | null; createdAt: Date }[];
 };
 
+function getRomanMonth(monthIndex: number) {
+  const numerals = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
+  return numerals[monthIndex];
+}
+
+function formatAestheticDate(date: Date) {
+  const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const dayName = days[date.getDay()];
+  const dateNum = date.getDate().toString().padStart(2, '0');
+  const romanMonth = getRomanMonth(date.getMonth());
+  return `${dayName} · ${dateNum}.${romanMonth}`;
+}
+
 export function ClientTrackerNote() {
   const { trackers, isLoaded } = useTrackers();
   const [goal, setGoal] = useState<GoalData | null>(null);
@@ -35,7 +48,7 @@ export function ClientTrackerNote() {
       <div className="tracing-paper paper-lift relative p-7">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <RefId>№ 004.128 · TODAY</RefId>
-          <Label>Tue · 03.XI</Label>
+          <Label>{formatAestheticDate(new Date())}</Label>
         </div>
         <h3 className="mt-5 font-serif text-[1.35rem] leading-[1.35]">
           On the quiet <span className="italic">difficulty</span> of small daily entries.
@@ -58,7 +71,7 @@ export function ClientTrackerNote() {
 
   const latestEntry = goal.entries[0];
   const dateStr = latestEntry 
-    ? new Date(latestEntry.createdAt).toLocaleDateString(undefined, { weekday: 'short', day: '2-digit', month: 'short' }) 
+    ? formatAestheticDate(new Date(latestEntry.createdAt))
     : 'No entries';
     
   const timeStr = latestEntry

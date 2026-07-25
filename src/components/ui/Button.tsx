@@ -16,23 +16,23 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         disabled={isActuallyDisabled}
         className={cn(
-          // Base styles: mechanical feel, 0ms hover, instant active depression, no border radius
-          'inline-flex items-center justify-center font-semibold tracking-tight transition-none active:translate-y-[2px]',
-          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-catalyst-cyan)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-background)]',
+          // Base styles: architectural, physical feel
+          'inline-flex items-center justify-center font-serif tracking-widest uppercase transition-all duration-200 active:translate-y-[2px]',
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-burgundy)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-paper)]',
           'disabled:pointer-events-none disabled:opacity-50 disabled:active:translate-y-0',
-          'rounded-none border-0',
+          'rounded-none border-2',
           
           // Variants
-          variant === 'primary' && 'bg-[var(--color-catalyst-cyan)] text-[var(--color-core-ink)] hover:bg-[var(--color-catalyst-cyan-hover)] active:bg-[var(--color-catalyst-cyan-active)]',
-          variant === 'secondary' && 'bg-[var(--color-liquid-metal-200)] text-[var(--color-core-ink)] hover:bg-[var(--color-liquid-metal-300)] active:bg-[var(--color-liquid-metal-400)]',
-          variant === 'ghost' && 'bg-transparent text-[var(--color-foreground)] hover:bg-[var(--color-core-ink-600)] active:bg-[var(--color-core-ink-700)]',
-          variant === 'danger' && 'bg-[var(--color-critical)] text-white hover:bg-[var(--color-critical-hover)] active:bg-[var(--color-critical)]',
-          variant === 'icon' && 'bg-transparent text-[var(--color-foreground)] hover:bg-[var(--color-core-ink-600)] active:bg-[var(--color-core-ink-700)]',
+          variant === 'primary' && 'border-[color:var(--color-ink)] bg-[color:var(--color-ink)] text-[color:var(--color-paper)] hover:bg-transparent hover:text-[color:var(--color-ink)] active:bg-[color:var(--color-burgundy)] active:border-[color:var(--color-burgundy)] active:text-white',
+          variant === 'secondary' && 'border-[color:var(--color-rule)] bg-transparent text-[color:var(--color-ink-soft)] hover:border-[color:var(--color-ink)] hover:text-[color:var(--color-ink)]',
+          variant === 'ghost' && 'border-transparent bg-transparent text-[color:var(--color-ink-soft)] hover:text-[color:var(--color-ink)]',
+          variant === 'danger' && 'border-red-900 bg-red-900 text-white hover:bg-transparent hover:text-red-900',
+          variant === 'icon' && 'border-transparent bg-transparent text-[color:var(--color-ink)] hover:bg-[color:var(--color-rule)]',
           
           // Sizes
-          size === 'default' && 'h-12 px-6 py-3',
-          size === 'sm' && 'h-10 px-4 py-2 text-sm',
-          size === 'lg' && 'h-16 px-8 py-4 text-lg',
+          size === 'default' && 'h-12 px-6 py-3 text-[0.85rem]',
+          size === 'sm' && 'h-10 px-4 py-2 text-[0.75rem]',
+          size === 'lg' && 'h-14 px-8 py-4 text-[0.95rem]',
           size === 'icon' && 'h-12 w-12 p-3',
           className
         )}

@@ -15,6 +15,7 @@ export const metadata: Metadata = {
 import { ClientLogForm } from '@/components/ClientLogForm';
 import { DestroyTracker } from '@/components/DestroyTracker';
 import { GoalDescriptionEditor } from '@/components/GoalDescriptionEditor';
+import { GoalCategoryEditor } from '@/components/GoalCategoryEditor';
 import { ClientLogList } from '@/components/ClientLogList';
 import { CopyLinkButton } from '@/components/CopyLinkButton';
 import { Label, RefId, MarginNote, Stitch } from '@/components/AtelierPrimitives';
@@ -51,6 +52,7 @@ export default async function EditGoalPage(props: { params: Promise<{ id: string
               <span className="italic break-words">{goal.title}</span>
             </h2>
             <GoalDescriptionEditor goalId={goal.id} initialDescription={goal.description} />
+            <GoalCategoryEditor goalId={goal.id} initialCategory={goal.category} />
             <div className="mt-8 flex items-center gap-8">
               <div>
                 <RefId>CURRENT</RefId>

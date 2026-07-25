@@ -1,4 +1,6 @@
 import React from 'react';
+import { ArchiveManifest } from './ArchiveManifest';
+import { getArchiveStats } from '@/app/actions';
 
 export function RefId({ children, className = '' }: { children: React.ReactNode, className?: string }) {
   return <span className={`ref-id ${className}`}>{children}</span>;
@@ -43,68 +45,26 @@ export function ReferenceSnippet({
   );
 }
 
-export function ComponentAtlas() {
-  const items = [
-    {
-      n: "α",
-      title: "Learning Goal",
-      body: "A single objective, pinned to the desk. Long enough to matter, narrow enough to keep.",
-    },
-    {
-      n: "β",
-      title: "Daily Entry",
-      body: "A dated fragment with a subject and a margin. Two sentences count.",
-    },
-    {
-      n: "γ",
-      title: "Streak",
-      body: "A binding stitch, not a heatmap. Missed days remain visible; the book still holds.",
-    },
-    {
-      n: "δ",
-      title: "Public Link",
-      body: "Your archive opened as a bound volume — permanent, quiet, well-typed.",
-    },
-  ];
+export async function ComponentAtlas() {
+  const stats = await getArchiveStats();
+  
   return (
     <section className="mx-auto max-w-[1180px] px-8 py-32">
-      <div className="flex items-end justify-between">
+      <div className="flex items-end justify-between mb-8">
         <div>
-          <Label>Fig. 05 · Objects in the drawer</Label>
+          <Label>Fig. 05 · The Archival Record</Label>
           <h2 className="mt-5 font-serif text-[2.4rem] leading-[1.1] tracking-tight">
-            Four <span className="italic">objects</span>. Nothing else.
+            An accumulation of <span className="italic">quiet work</span>.
           </h2>
         </div>
-        <RefId>index · α β γ δ</RefId>
+        <RefId>manifest · 2026</RefId>
       </div>
-      <div className="mt-14 grid grid-cols-1 md:grid-cols-4">
-        {items.map((it, i) => (
-          <article
-            key={it.n}
-            className={
-              "group relative py-2 md:py-4 md:px-8 " +
-              (i === 0 ? "md:pl-0 " : "") +
-              (i === items.length - 1 ? "md:pr-0 " : "") +
-              (i < items.length - 1
-                ? "md:border-r md:border-[color:var(--color-rule)]"
-                : "")
-            }
-          >
-            <div className="flex items-baseline justify-between">
-              <span className="font-serif text-[2.8rem] leading-none text-[color:var(--color-burgundy)] transition-transform duration-300 group-hover:-translate-y-0.5 inline-block">
-                {it.n}
-              </span>
-              <RefId>0{i + 1}</RefId>
-            </div>
-            <h3 className="mt-8 font-serif text-[1.4rem] leading-[1.25]">
-              {it.title}
-            </h3>
-            <p className="mt-4 font-serif text-[0.95rem] leading-[1.75] text-[color:var(--color-ink-soft)]">
-              {it.body}
-            </p>
-          </article>
-        ))}
-      </div>
+      <ArchiveManifest 
+        fragmentsCount={stats.fragmentsCount}
+        longestChain={stats.longestChain}
+        activeFoliosCount={stats.activeFoliosCount}
+        subjectsCount={stats.subjectsCount}
+      />
     </section>
   );
 }

@@ -195,6 +195,7 @@ export async function sendBackupEmail(email: string, editUrl: string) {
 
 export async function getRecentGoals(limit: number = 3) {
   return await prisma.goal.findMany({
+    where: { status: 'ACTIVE' },
     orderBy: { createdAt: 'desc' },
     take: limit,
   });
@@ -213,6 +214,27 @@ export async function getCommunityFeed(limit: number = 3) {
   });
 }
 
+export async function getArchiveStats() {
+  const fragmentsCount = await prisma.logEntry.count();
+  const maxStreakResult = await prisma.goal.aggregate({
+    _max: {
+      longestStreak: true
+    }
+  });
+  const longestChain = maxStreakResult._max.longestStreak || 0;
+  const activeFoliosCount = await prisma.goal.count({
+    where: { status: 'ACTIVE' }
+  });
+  const subjectsCount = await prisma.goal.count();
+  
+  return {
+    fragmentsCount,
+    longestChain,
+    activeFoliosCount,
+    subjectsCount,
+  };
+}
+
 const deleteGoalSchema = z.object({
   id: z.string().uuid(),
 });
@@ -225,4 +247,31 @@ export async function deleteGoal(id: string) {
   });
 
   return { success: true };
+}
+
+export async function archiveGoal(id: string) {
+  await prisma.goal.update({
+    where: { id },
+    data: { status: 'ARCHIVED' }
+  });
+  return { success: true };
+}
+
+export async function updateGoalCategory(id: string, category: string) {
+  await prisma.goal.update({
+    where: { id },
+    data: { category }
+  });
+  return { success: true };
+}
+
+export async function getAllEntries() {
+  return await prisma.logEntry.findMany({
+    include: {
+      goal: true
+    },
+    orderBy: {
+      createdAt: 'desc'
+    }
+  });
 }

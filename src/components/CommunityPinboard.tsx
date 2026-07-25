@@ -556,7 +556,7 @@ export default async function CommunityPinboard() {
                 lineHeight: 1.7,
               }}
             >
-              Three fragments pinned to the shared board this week — small
+              Fragments pinned to the shared board this week — small
               pieces of larger, patient projects filed in the open.
             </p>
           </div>
@@ -664,9 +664,6 @@ export default async function CommunityPinboard() {
             “A shared workspace of people learning together — filed carefully,
             read slowly.”
           </p>
-          <Link href="/community" className="ink-link label-caps">
-            Browse the full board →
-          </Link>
         </div>
       </div>
     </section>

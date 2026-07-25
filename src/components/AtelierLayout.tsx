@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { LiveFooter } from './LiveFooter';
 
 export function TopIndex() {
   const [timeStr, setTimeStr] = useState<string>('');
@@ -32,7 +33,7 @@ export function TopIndex() {
   const tabs = [
     { label: "Desk", active: pathname === "/", href: "/" },
     { label: "Community", active: pathname === "/community", href: "/community" },
-    { label: "Entries", active: false },
+    { label: "Entries", active: pathname === "/entries", href: "/entries" },
     { label: "Goals", active: false },
     { label: "Archive", active: false },
   ];
@@ -73,49 +74,7 @@ export function TopIndex() {
 }
 
 export function Colophon() {
-  return (
-    <footer className="border-t border-[color:var(--color-rule)] bg-[color:var(--color-paper-deep)]/60 mt-auto">
-      <div className="mx-auto grid max-w-[1180px] grid-cols-12 gap-8 px-8 py-14">
-        <div className="col-span-12 md:col-span-5">
-          <Label>Colophon</Label>
-          <p className="mt-4 font-serif text-[0.98rem] leading-[1.65] text-[color:var(--color-ink-soft)] max-w-[42ch]">
-            Sync is set in{" "}
-            <span className="font-serif italic">Fraunces</span>,{" "}
-            <span className="font-sans">Inter&nbsp;Tight</span>, and{" "}
-            <span className="font-mono">JetBrains&nbsp;Mono</span>. Printed on
-            warm paper stock. Bound by hand, one day at a time.
-          </p>
-        </div>
-        <div className="col-span-6 md:col-span-3">
-          <Label>Sections</Label>
-          <ul className="mt-4 space-y-1 font-serif text-[0.95rem]">
-            <li className="footnote-link inline-block">Desk</li><br />
-            <li className="footnote-link inline-block">Entries</li><br />
-            <li className="footnote-link inline-block">Goals</li><br />
-            <li className="footnote-link inline-block">Public link</li>
-          </ul>
-        </div>
-        <div className="col-span-6 md:col-span-2">
-          <Label>Marginalia</Label>
-          <ul className="mt-4 space-y-1 font-serif text-[0.95rem]">
-            <li className="footnote-link inline-block">On centers</li><br />
-            <li className="footnote-link inline-block">Field notes</li><br />
-            <li className="footnote-link inline-block">Sources</li>
-          </ul>
-        </div>
-        <div className="col-span-12 md:col-span-2 flex flex-col justify-between">
-          <Stamp>Vol. IV · MMXXVI</Stamp>
-          <RefId>SYNC · 004 / 0128</RefId>
-        </div>
-      </div>
-      <div className="border-t border-dashed border-[color:var(--color-rule)]">
-        <div className="mx-auto flex max-w-[1180px] items-center justify-between px-8 py-4">
-          <RefId>© e. shirakawa — kept quietly</RefId>
-          <RefId>rev 12 · pressed on paper</RefId>
-        </div>
-      </div>
-    </footer>
-  );
+  return <LiveFooter />;
 }
 
 function Label({ children }: { children: React.ReactNode }) {

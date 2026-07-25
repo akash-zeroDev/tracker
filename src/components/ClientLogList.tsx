@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNow, format } from 'date-fns';
 import { Label, RefId } from '@/components/AtelierPrimitives';
 
 interface ClientLogListProps {
@@ -41,7 +41,7 @@ export function ClientLogList({ entries }: ClientLogListProps) {
               <div className="col-span-12 md:col-span-2">
                 <RefId>{e.id.split('-')[0]}</RefId>
                 <div className="mt-3 font-mono text-[0.85rem] text-[color:var(--color-ink)]">
-                  {new Date(e.createdAt).toLocaleDateString()}
+                  {format(new Date(e.createdAt), 'dd MMM yyyy')}
                 </div>
                 <div className="mt-4 label-caps opacity-60">
                   {formatDistanceToNow(new Date(e.createdAt))} ago

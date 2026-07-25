@@ -13,7 +13,9 @@ model Goal {
   publicSlug    String      @unique
   title         String
   description   String?
-  createdAt       DateTime    @default(now())
+  category      String?
+  status        String      @default("ACTIVE")
+  createdAt     DateTime    @default(now())
   currentStreak   Int         @default(0)
   longestStreak   Int         @default(0)
   lastLogDateText String?
