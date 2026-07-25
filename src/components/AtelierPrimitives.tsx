@@ -22,6 +22,30 @@ export function MarginNote({ children }: { children: React.ReactNode }) {
   );
 }
 
+export function FoldRule({ className = "" }: { className?: string }) {
+  return <div className={`h-px w-full bg-[var(--color-rule)] ${className}`} aria-hidden />;
+}
+
+export function SectionHeading({
+  index,
+  title,
+  hint,
+}: {
+  index: string;
+  title: string;
+  hint?: string;
+}) {
+  return (
+    <div className="flex items-baseline justify-between gap-6">
+      <div className="flex items-baseline gap-4">
+        <RefId>{index}</RefId>
+        <h3 className="font-serif text-xl leading-none tracking-tight">{title}</h3>
+      </div>
+      {hint && <Label className="hidden sm:inline">{hint}</Label>}
+    </div>
+  );
+}
+
 export function ReferenceSnippet({
   id,
   source,

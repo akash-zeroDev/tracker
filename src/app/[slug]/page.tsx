@@ -5,6 +5,7 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 
 import { Label, RefId } from '@/components/AtelierPrimitives';
+import { PublicFragmentsList } from '@/components/PublicFragmentsList';
 
 export async function generateMetadata(
   props: { params: Promise<{ slug: string }> }
@@ -30,6 +31,22 @@ export default async function PublicGoalPage(props: { params: Promise<{ slug: st
 
   if (!goal) {
     notFound();
+  }
+
+  if (!goal.isPublic) {
+    return (
+      <main className="min-h-screen text-[color:var(--color-ink)] flex items-center justify-center p-8 bg-[color:var(--color-surface)]">
+        <div className="paper-sheet paper-lift p-10 max-w-lg w-full text-center">
+          <Label>Archive Sealed</Label>
+          <h2 className="mt-4 font-serif text-[1.8rem] leading-[1.2] italic text-[color:var(--color-ink-soft)]">
+            This volume is currently kept in the private vault.
+          </h2>
+          <p className="mt-6 font-serif text-[0.9rem] opacity-60">
+            The curator has withdrawn this edition from the public shelf.
+          </p>
+        </div>
+      </main>
+    );
   }
 
   // Removed old lattice logic variables that are no longer used by Atelier design
@@ -89,26 +106,7 @@ export default async function PublicGoalPage(props: { params: Promise<{ slug: st
                 </div>
                 
                 <div className="flex flex-col gap-10">
-                  {goal.entries.length === 0 ? (
-                    <article>
-                      <span className="ref-id">CHAPTER 1</span>
-                      <h3 className="mt-3 font-serif text-[2rem] leading-[1.15] tracking-tight text-[color:var(--color-ink-soft)] italic">
-                        Awaiting first entry.
-                      </h3>
-                    </article>
-                  ) : (
-                    goal.entries.map((entry, index) => (
-                      <article key={entry.id}>
-                        <div className="flex justify-between items-baseline">
-                          <span className="ref-id">CHAPTER · § {goal.entries.length - index}</span>
-                          <span className="ref-id opacity-60">{new Date(entry.createdAt).toLocaleDateString()}</span>
-                        </div>
-                        <h3 className="mt-3 font-serif text-[1.4rem] leading-[1.3] tracking-tight break-words">
-                          {entry.content || 'Logged a streak without notes.'}
-                        </h3>
-                      </article>
-                    ))
-                  )}
+                  <PublicFragmentsList entries={goal.entries} />
                 </div>
               </div>
             </div>

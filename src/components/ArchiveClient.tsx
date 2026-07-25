@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef, useState, useEffect } from 'react';
-import { motion, useInView, animate } from 'framer-motion';
+import { motion, useInView, animate, AnimatePresence } from 'framer-motion';
 import { Stamp } from '@/components/AtelierPrimitives';
 import Link from 'next/link';
 
@@ -178,6 +178,43 @@ function Volume({ vol }: { vol: ArchiveVolumeData }) {
   );
 }
 
+function SortCycler({ sortBy, setSortBy }: { sortBy: string, setSortBy: (v: string) => void }) {
+  const options = [
+    { id: "Newest", label: "Newest Edition" },
+    { id: "Oldest", label: "Oldest Edition" },
+    { id: "Longest", label: "Longest Journey" },
+    { id: "Entries", label: "Most Entries" },
+    { id: "Alphabetical", label: "Alphabetical" }
+  ];
+
+  const currentIndex = options.findIndex(o => o.id === sortBy);
+  const activeLabel = options[currentIndex]?.label;
+
+  const handleCycle = () => {
+    const nextIndex = (currentIndex + 1) % options.length;
+    setSortBy(options[nextIndex].id);
+  };
+
+  return (
+    <button 
+      onClick={handleCycle}
+      className="group flex items-center gap-2 appearance-none bg-transparent font-serif text-[0.95rem] italic text-[color:var(--color-ink)] cursor-pointer outline-none border-b border-dashed border-[color:var(--color-ink-soft)] pb-0.5 hover:border-[color:var(--color-burgundy)] hover:text-[color:var(--color-burgundy)] transition-colors duration-300"
+    >
+      <AnimatePresence mode="wait">
+        <motion.span
+          key={sortBy}
+          initial={{ opacity: 0, y: 5 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -5 }}
+          transition={{ duration: 0.15 }}
+        >
+          {activeLabel}
+        </motion.span>
+      </AnimatePresence>
+    </button>
+  );
+}
+
 /* ————— MAIN PAGE COMPONENT ————— */
 
 export function ArchiveClient({ volumes, stats }: { volumes: ArchiveVolumeData[], stats: any }) {
@@ -254,19 +291,9 @@ export function ArchiveClient({ volumes, stats }: { volumes: ArchiveVolumeData[]
             </React.Fragment>
           ))}
         </nav>
-        <div className="flex gap-4 opacity-80 items-center">
+        <div className="flex gap-4 opacity-80 items-baseline">
           <span className="font-mono text-[0.65rem] tracking-widest uppercase">Sort By</span>
-          <select 
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value as any)}
-            className="appearance-none bg-transparent font-serif text-[0.95rem] italic text-[color:var(--color-ink)] cursor-pointer outline-none border-b border-dashed border-[color:var(--color-ink-soft)] pb-0.5"
-          >
-            <option value="Newest">Newest Edition</option>
-            <option value="Oldest">Oldest Edition</option>
-            <option value="Longest">Longest Journey</option>
-            <option value="Entries">Most Entries</option>
-            <option value="Alphabetical">Alphabetical</option>
-          </select>
+          <SortCycler sortBy={sortBy} setSortBy={setSortBy as any} />
         </div>
       </div>
 

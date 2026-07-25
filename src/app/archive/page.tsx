@@ -59,8 +59,11 @@ export default async function ArchivePage() {
 
   // Calculate distinct years archived
   const years = new Set(archivedGoals.map(g => new Date(g.createdAt).getFullYear()));
-  stats.yearsCount = years.size;
-  stats.archivedCount = archivedGoals.length;
+  const extendedStats = {
+    ...stats,
+    yearsCount: years.size,
+    archivedCount: archivedGoals.length
+  };
 
-  return <ArchiveClient volumes={volumes} stats={stats} />;
+  return <ArchiveClient volumes={volumes} stats={extendedStats} />;
 }

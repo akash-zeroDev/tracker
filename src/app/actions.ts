@@ -156,6 +156,15 @@ export async function updateGoalDescription(id: string, description: string) {
   return { success: true };
 }
 
+export async function toggleGoalVisibility(id: string, isPublic: boolean) {
+  await prisma.goal.update({
+    where: { id },
+    data: { isPublic },
+  });
+  
+  return { success: true };
+}
+
 const sendBackupEmailSchema = z.object({
   email: z.string().email(),
   editUrl: z.string().url(),
@@ -198,6 +207,11 @@ export async function getRecentGoals(limit: number = 3) {
     where: { status: 'ACTIVE' },
     orderBy: { createdAt: 'desc' },
     take: limit,
+    include: {
+      entries: {
+        orderBy: { createdAt: 'desc' }
+      }
+    }
   });
 }
 

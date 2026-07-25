@@ -71,7 +71,7 @@ export function LiveFooter() {
               </Link>
             </motion.li>
             <motion.li variants={itemVariants}>
-              <span className="footnote-link inline-block opacity-50 cursor-not-allowed">Public Archive</span>
+              <Link href="/archive" className="footnote-link inline-block hover:text-[color:var(--color-burgundy)] transition-colors duration-300">Archive</Link>
             </motion.li>
           </ul>
         </div>

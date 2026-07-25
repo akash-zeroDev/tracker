@@ -57,22 +57,22 @@ export function GoalDescriptionEditor({ goalId, initialDescription }: GoalDescri
 
   if (isEditing) {
     return (
-      <div className="relative mt-6 max-w-[38ch]">
+      <div className="mt-6 max-w-[38ch] flex flex-col gap-2">
         <textarea
           ref={textareaRef}
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           onKeyDown={handleKeyDown}
           disabled={isSaving}
-          className="w-full min-h-[120px] resize-y bg-transparent p-3 font-serif text-[0.98rem] leading-[1.75] text-[color:var(--color-ink)] border border-[color:var(--color-rule)] focus:border-[color:var(--color-ink)] focus:outline-none rounded-md transition-colors disabled:opacity-50"
+          className="w-full min-h-[120px] resize-y bg-transparent p-3 font-serif text-[0.98rem] leading-[1.75] text-[color:var(--color-ink)] border border-[color:var(--color-rule)] focus:border-[color:var(--color-ink)] focus:outline-none rounded-md transition-colors disabled:opacity-50 break-words"
           placeholder="Describe your learning goal... (Cmd+Enter to save)"
         />
         {errorMsg && (
-          <div className="absolute -bottom-8 left-0 right-0 text-xs text-red-600 font-mono tracking-wide">
+          <div className="text-xs text-red-600 font-mono tracking-wide">
             {errorMsg}
           </div>
         )}
-        <div className="absolute bottom-3 right-3 flex items-center gap-2">
+        <div className="flex items-center justify-end gap-2">
           <button
             onClick={() => {
               setDescription(initialDescription || '');

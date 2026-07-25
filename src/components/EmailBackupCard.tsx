@@ -4,7 +4,8 @@ import React, { useState, useEffect, useTransition } from 'react';
 import { Button } from '@/components/ui/Button';
 import { Input, FieldGroup, ValidationMessage } from '@/components/ui/forms';
 import { sendBackupEmail } from '@/app/actions';
-import { Check } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Label } from '@/components/AtelierPrimitives';
 
 export function EmailBackupCard({ editUrl }: { editUrl: string }) {
   const [email, setEmail] = useState('');
@@ -15,7 +16,6 @@ export function EmailBackupCard({ editUrl }: { editUrl: string }) {
   useEffect(() => {
     const savedEmail = localStorage.getItem('backup_email_v1');
     if (savedEmail) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setEmail(savedEmail);
     }
   }, []);
@@ -36,56 +36,77 @@ export function EmailBackupCard({ editUrl }: { editUrl: string }) {
         setIsVaulted(true);
       } catch (err) {
         console.error(err);
-        setError('Failed to vault tracker.');
+        setError('Failed to seal vault.');
       }
     });
   };
 
-  if (isVaulted) {
-    return (
-      <div className="flex items-center justify-between w-full">
-        <div className="flex items-center gap-2 text-sm text-[var(--color-catalyst-cyan)] font-medium">
-          <Check className="h-4 w-4" />
-          <span>Vaulted securely to {email}</span>
-        </div>
-        <button 
-          onClick={() => setIsVaulted(false)}
-          className="text-xs uppercase tracking-widest opacity-50 hover:opacity-100 hover:text-[var(--color-catalyst-cyan)] transition-colors"
-        >
-          UPDATE EMAIL
-        </button>
-      </div>
-    );
-  }
-
   return (
-    <form onSubmit={handleSubmit} className="w-full">
-      <FieldGroup>
-        <div className="flex flex-col sm:flex-row gap-2">
-          <Input
-            type="email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="your@email.com"
-            disabled={isPending}
-            aria-invalid={!!error}
-            className={`flex-1 ${error ? 'border-[var(--color-critical)] focus:border-[var(--color-critical)]' : ''}`}
-          />
-          <Button
-            type="submit"
-            variant="secondary"
-            isLoading={isPending}
-            className="w-full sm:w-auto"
+    <div className="tracing-paper paper-lift p-6 flex flex-col relative overflow-hidden">
+      <div className="flex justify-between items-center mb-6">
+        <Label>SECRET VAULT</Label>
+      </div>
+
+      <AnimatePresence mode="wait">
+        {isVaulted ? (
+          <motion.div 
+            key="sealed"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="flex flex-col gap-4 text-center py-4"
           >
-            VAULT
-          </Button>
-        </div>
-        <ValidationMessage 
-          error={error || (isPending ? '' : undefined)} 
-          helpText={error ? "Vault delivery failed. Verify email format or retry." : "Architecture relies on local coordinates. To prevent permanent loss, secure this URL to an external vault."} 
-        />
-      </FieldGroup>
-    </form>
+            <div className="font-serif italic text-[1.1rem] text-[color:var(--color-ink)]">
+              Envelope quietly sealed.
+            </div>
+            <p className="font-serif text-[0.8rem] text-[color:var(--color-ink-soft)] leading-snug">
+              Secure link dispatched to <br /> <span className="text-[color:var(--color-ink)] font-mono text-[0.7rem]">{email}</span>
+            </p>
+            <button 
+              onClick={() => setIsVaulted(false)}
+              className="mt-2 text-[0.7rem] font-serif italic text-[color:var(--color-ink-soft)] hover:text-[color:var(--color-burgundy)] transition-colors"
+            >
+              Update delivery address
+            </button>
+          </motion.div>
+        ) : (
+          <motion.form 
+            key="form"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            onSubmit={handleSubmit} 
+            className="flex flex-col gap-4"
+          >
+            <p className="font-serif text-[0.8rem] leading-relaxed text-[color:var(--color-ink-soft)]">
+              Your archive relies on local coordinates. Without this secret URL, your volume is lost if your browser clears.
+            </p>
+            
+            <div className="relative">
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="editor@press.com"
+                disabled={isPending}
+                className="w-full bg-transparent border-b border-[color:var(--color-rule)] font-serif text-[0.95rem] py-2 focus:outline-none focus:border-[color:var(--color-ink)] transition-colors placeholder:italic placeholder:opacity-40"
+              />
+            </div>
+            
+            <div className="flex justify-between items-center mt-2">
+              <span className="text-[0.75rem] font-serif text-[color:var(--color-burgundy)]">{error}</span>
+              <button
+                type="submit"
+                disabled={isPending}
+                className="appearance-none font-serif italic text-[0.9rem] hover:text-[color:var(--color-burgundy)] transition-colors disabled:opacity-50 border-b border-dashed border-transparent hover:border-[color:var(--color-burgundy)] pb-0.5 ml-auto"
+              >
+                {isPending ? 'Sealing...' : 'Send to vault'}
+              </button>
+            </div>
+          </motion.form>
+        )}
+      </AnimatePresence>
+    </div>
   );
 }

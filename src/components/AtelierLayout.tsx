@@ -31,7 +31,7 @@ export function TopIndex() {
   const pathname = usePathname();
 
   const tabs = [
-    { label: "Desk", active: pathname === "/", href: "/" },
+    { label: "Desk", active: pathname === "/desk", href: "/desk" },
     { label: "Community", active: pathname === "/community", href: "/community" },
     { label: "Entries", active: pathname === "/entries", href: "/entries" },
     { label: "Archive", active: pathname === "/archive", href: "/archive" },

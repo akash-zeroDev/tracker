@@ -45,25 +45,19 @@ export function ClientTrackerNote() {
   // If loading or no trackers, show the default static dummy note (as before)
   if (!isLoaded || trackers.length === 0 || !goal) {
     return (
-      <div className="tracing-paper paper-lift relative p-7">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <RefId>№ 004.128 · TODAY</RefId>
+      <div className="tracing-paper paper-lift relative p-7 flex flex-col justify-center min-h-[300px]">
+        <div className="absolute top-7 left-7 right-7 flex flex-wrap items-center justify-between gap-2">
+          <RefId>№ 004.128 · STATUS</RefId>
           <Label>{formatAestheticDate(new Date())}</Label>
         </div>
-        <h3 className="mt-5 font-serif text-[1.35rem] leading-[1.35]">
-          On the quiet <span className="italic">difficulty</span> of small daily entries.
-        </h3>
-        <p className="mt-4 font-serif text-[0.95rem] leading-[1.7] text-[color:var(--color-ink-soft)]">
-          Attempted a first sketch of a state machine for the entry composer. The hard
-          part isn&apos;t the machine — it&apos;s admitting that most days the note is only two
-          sentences long, and that this is enough.
-        </p>
-        <hr className="fold-line my-6" />
-        <div className="flex items-center justify-between">
-          <Label>Filed 07:38</Label>
-          <span className="text-[0.9rem] font-serif italic text-[color:var(--color-ink-soft)]">
-            Awaiting first folio
-          </span>
+        
+        <div className="text-center mt-8 mb-4">
+          <h3 className="font-serif text-[1.4rem] leading-[1.35] text-[color:var(--color-ink)] mb-3">
+            No folio <span className="italic">selected</span>.
+          </h3>
+          <p className="font-serif text-[0.95rem] leading-[1.7] text-[color:var(--color-ink-soft)] max-w-[240px] mx-auto">
+            Select an active folio from your desk below, or declare a new learning goal to begin your first entry.
+          </p>
         </div>
       </div>
     );
