@@ -10,9 +10,8 @@ export const Input = React.forwardRef<HTMLInputElement, React.InputHTMLAttribute
         'flex h-12 w-full rounded-none border border-[var(--color-border-primary)] bg-[var(--color-background)] px-4 py-2 text-base text-[var(--color-foreground)] transition-none',
         'file:border-0 file:bg-transparent file:text-sm file:font-medium',
         'placeholder:text-[var(--color-liquid-metal-500)]',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-catalyst-cyan)] focus-visible:ring-offset-0 focus-visible:border-[var(--color-catalyst-cyan)]',
         'disabled:cursor-not-allowed disabled:opacity-50',
-        ariaInvalid && 'border-[var(--color-critical)] focus-visible:ring-[var(--color-critical)] focus-visible:border-[var(--color-critical)]',
+        ariaInvalid && 'border-[var(--color-critical)]',
         className
       )}
       ref={ref}
@@ -29,9 +28,8 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, React.TextareaHTML
       className={cn(
         'flex min-h-[120px] w-full rounded-none border border-[var(--color-border-primary)] bg-[var(--color-background)] px-4 py-3 text-base text-[var(--color-foreground)] transition-none',
         'placeholder:text-[var(--color-liquid-metal-500)]',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-catalyst-cyan)] focus-visible:ring-offset-0 focus-visible:border-[var(--color-catalyst-cyan)]',
         'disabled:cursor-not-allowed disabled:opacity-50',
-        ariaInvalid && 'border-[var(--color-critical)] focus-visible:ring-[var(--color-critical)] focus-visible:border-[var(--color-critical)]',
+        ariaInvalid && 'border-[var(--color-critical)]',
         className
       )}
       ref={ref}
@@ -47,7 +45,7 @@ export const Checkbox = React.forwardRef<HTMLInputElement, React.InputHTMLAttrib
     <input
       type="checkbox"
       className={cn(
-        'peer h-5 w-5 appearance-none rounded-none border border-[var(--color-border-primary)] bg-transparent checked:bg-[var(--color-catalyst-cyan)] checked:border-[var(--color-catalyst-cyan)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-catalyst-cyan)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-background)] disabled:cursor-not-allowed disabled:opacity-50 transition-none',
+        'peer h-5 w-5 appearance-none rounded-none border border-[var(--color-border-primary)] bg-transparent checked:bg-[var(--color-catalyst-cyan)] checked:border-[var(--color-catalyst-cyan)] disabled:cursor-not-allowed disabled:opacity-50 transition-none',
         className
       )}
       ref={ref}
@@ -63,7 +61,7 @@ export const Switch = React.forwardRef<HTMLInputElement, React.InputHTMLAttribut
       type="checkbox"
       role="switch"
       className={cn(
-        'peer h-6 w-11 appearance-none rounded-none border border-[var(--color-border-primary)] bg-[var(--color-core-ink-600)] checked:bg-[var(--color-catalyst-cyan)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-catalyst-cyan)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-background)] disabled:cursor-not-allowed disabled:opacity-50 transition-none cursor-pointer',
+        'peer h-6 w-11 appearance-none rounded-none border border-[var(--color-border-primary)] bg-[var(--color-core-ink-600)] checked:bg-[var(--color-catalyst-cyan)] disabled:cursor-not-allowed disabled:opacity-50 transition-none cursor-pointer',
         className
       )}
       ref={ref}

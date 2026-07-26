@@ -4,7 +4,7 @@ import { PrismaClient } from '@prisma/client';
 import { formatInTimeZone } from 'date-fns-tz';
 import nodemailer from 'nodemailer';
 import { z } from 'zod';
-
+import { revalidatePath } from 'next/cache';
 const prisma = new PrismaClient();
 
 // Generate a random slug for the public URL

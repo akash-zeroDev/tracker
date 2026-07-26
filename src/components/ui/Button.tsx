@@ -18,7 +18,6 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         className={cn(
           // Base styles: architectural, physical feel
           'inline-flex items-center justify-center font-serif tracking-widest uppercase transition-all duration-200 active:translate-y-[2px]',
-          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-burgundy)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-paper)]',
           'disabled:pointer-events-none disabled:opacity-50 disabled:active:translate-y-0',
           'rounded-none border-2',
           

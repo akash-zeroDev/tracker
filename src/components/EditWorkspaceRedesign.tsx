@@ -104,7 +104,7 @@ function VolumePlate({ goal }: { goal: GoalData }) {
       <FoldRule className="my-10" />
 
       <dl className="grid grid-cols-3 gap-6">
-        <Stat label="Streak" value={goal.currentStreak} suffix="days" />
+        <ArchivalStreakStat label="Streak" value={goal.currentStreak} trigger={goal.entries.length} suffix="days" />
         <Stat label="Opened" value={ageDays} suffix="days ago" />
         <Stat label="Filed" value={goal.entries.length} suffix="frags." />
       </dl>
@@ -126,6 +126,44 @@ function Stat({ label, value, suffix }: { label: string; value: number; suffix: 
       <Label>{label}</Label>
       <div className="mt-2 flex items-baseline gap-1.5">
         <span className="font-serif text-3xl leading-none">{n}</span>
+        <span className="text-[11px] text-[var(--color-ink-soft)]">{suffix}</span>
+      </div>
+    </div>
+  );
+}
+
+function ArchivalStreakStat({ label, value, trigger, suffix }: { label: string; value: number; trigger?: number; suffix: string }) {
+  // We do not count up from 0. A physical archive displays the exact value.
+  // The animation triggers strictly when the trigger (entries length) changes.
+  
+  return (
+    <div>
+      <Label>{label}</Label>
+      <div className="mt-2 flex items-baseline gap-1.5 overflow-hidden py-1">
+        <AnimatePresence mode="popLayout" initial={false}>
+          <motion.span
+            key={trigger ?? value}
+            initial={{ opacity: 0, y: -25, rotateX: 60, filter: 'blur(3px)', textShadow: '0px 0px 0px rgba(0,0,0,0)' }}
+            animate={{ 
+              opacity: 1, 
+              y: 0, 
+              rotateX: 0,
+              filter: 'blur(0px)',
+              textShadow: '0px 2px 2px rgba(0,0,0,0.1), 0px -1px 1px rgba(255,255,255,0.7)' // The blind emboss impression
+            }}
+            exit={{ opacity: 0, y: 25, rotateX: -60, filter: 'blur(3px)', textShadow: '0px 0px 0px rgba(0,0,0,0)' }}
+            transition={{
+              type: "spring",
+              stiffness: 220,
+              damping: 18,
+              mass: 2.5, // Heavy mechanical feel
+            }}
+            className="font-serif text-3xl leading-none block origin-center"
+            style={{ perspective: 1000 }}
+          >
+            {value}
+          </motion.span>
+        </AnimatePresence>
         <span className="text-[11px] text-[var(--color-ink-soft)]">{suffix}</span>
       </div>
     </div>
@@ -157,6 +195,7 @@ function WritingSurface({ goal }: { goal: GoalData }) {
   const [text, setText] = React.useState("");
   const [isPending, startTransition] = React.useTransition();
   const [exitIntentFlash, setExitIntentFlash] = React.useState(false);
+  const [stampedFragment, setStampedFragment] = React.useState<number | null>(null);
   const router = useRouter();
   
   const words = text.trim() ? text.trim().split(/\s+/).length : 0;
@@ -183,6 +222,8 @@ function WritingSurface({ goal }: { goal: GoalData }) {
       try {
         const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
         await addLogEntry(goal.id, text, tz);
+        setStampedFragment(goal.entries.length + 1);
+        setTimeout(() => setStampedFragment(null), 2500); // Auto-hide after 2.5 seconds
         setText("");
         router.refresh();
       } catch (err) {
@@ -205,7 +246,9 @@ function WritingSurface({ goal }: { goal: GoalData }) {
       <FoldRule className="mt-6" />
 
       {/* Ruled writing area */}
-      <div 
+      <motion.div 
+        animate={stampedFragment ? { scale: [1, 0.995, 1], y: [0, 1, 0] } : {}}
+        transition={stampedFragment ? { duration: 0.3, times: [0, 0.2, 1], ease: "easeOut", delay: 0.05 } : {}}
         className={`relative mt-8 rounded-[4px] transition-all duration-500 ease-out ${
           exitIntentFlash ? 'ring-2 ring-[var(--color-burgundy)] bg-[var(--color-burgundy)]/5' : 'ring-1 ring-transparent'
         }`}
@@ -239,7 +282,10 @@ function WritingSurface({ goal }: { goal: GoalData }) {
         />
         <textarea
           value={text}
-          onChange={(e) => setText(e.target.value)}
+          onChange={(e) => {
+            setText(e.target.value);
+            if (stampedFragment !== null) setStampedFragment(null);
+          }}
           placeholder="Write today's fragment. A sentence is enough. The archive is patient."
           rows={18}
           disabled={isPending}
@@ -252,7 +298,14 @@ function WritingSurface({ goal }: { goal: GoalData }) {
           className={`relative w-full resize-none bg-transparent pl-14 pr-4 font-serif text-[17px] leading-8 tracking-[0.005em] text-[var(--color-ink)] placeholder:italic placeholder:text-[var(--color-ink-soft)]/70 focus:outline-none ${isPending ? 'opacity-50 blur-[1px]' : ''}`}
           style={{ caretColor: "var(--color-burgundy)" }}
         />
-      </div>
+
+        {/* Fragment Stamp (appears after successful submission) */}
+        <AnimatePresence>
+          {stampedFragment !== null && (
+            <FragmentStamp key="stamp" fragmentNumber={stampedFragment} />
+          )}
+        </AnimatePresence>
+      </motion.div>
 
       <FoldRule className="mt-8" />
 
@@ -809,7 +862,7 @@ function RecentFragments({ goal }: { goal: GoalData }) {
                     disabled={strikingIds.has(e.id)}
                     className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 p-1.5 text-[color:var(--color-ink-soft)] hover:text-[color:var(--color-burgundy)] rounded-full hover:bg-[color:var(--color-burgundy)]/10 disabled:opacity-0"
                   >
-                    <Flame className="w-4 h-4" />
+                    <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
                 
@@ -912,5 +965,90 @@ export default function EditWorkspaceRedesign({ goal }: { goal: GoalData }) {
         <Ref>№ {goal.id.split('-')[0].toUpperCase()} · shelf {goal.id.slice(0, 2).toUpperCase()}</Ref>
       </footer>
     </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Physical Fragment Stamp Animation
+// ─────────────────────────────────────────────────────────────────────────────
+
+function FragmentStamp({ fragmentNumber }: { fragmentNumber: number }) {
+  // Generate subtle physical randomness (always distinctly tilted by 30-40 degrees)
+  const rotation = React.useMemo(() => (Math.random() > 0.5 ? 1 : -1) * (30 + Math.random() * 10), []); 
+  const xOffset = React.useMemo(() => (Math.random() * 8 - 4), []);
+  const yOffset = React.useMemo(() => (Math.random() * 8 - 4), []);
+  const inkOpacity = React.useMemo(() => (0.88 + Math.random() * 0.12), []);
+
+  return (
+    <motion.div
+      initial={{ x: xOffset, y: yOffset, opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0, scale: 0.95, filter: "blur(2px)" }}
+      transition={{ duration: 0.4 }}
+      className="absolute inset-0 m-auto pointer-events-none z-50 flex items-center justify-center mix-blend-multiply w-fit h-fit"
+      style={{ perspective: 1000 }}
+    >
+      {/* 1. The Shadow (Simulates the descending handle) */}
+      <motion.div
+        initial={{ opacity: 0.15, scale: 1.5, y: -40, rotateZ: rotation }}
+        animate={{ 
+          opacity: [0.15, 0.4, 0, 0], 
+          scale:   [1.5,  0.8, 1, 1],
+          y:       [-40,  0,   0, 0]
+        }}
+        transition={{ duration: 0.75, times: [0, 0.2, 0.22, 1], ease: "easeIn" }}
+        className="absolute w-24 h-24 bg-black rounded-full blur-md"
+      />
+      
+      {/* 2. The Ink Transfer (Impact at 20% of timeline, persists) */}
+      <motion.div
+        initial={{ opacity: 0, scale: 1.05, rotateZ: rotation, filter: 'blur(3px)' }}
+        animate={{ 
+          opacity: [0, 0, inkOpacity, inkOpacity],
+          scale:   [1.05, 1.05, 0.98, 1],
+          filter:  ['blur(3px)', 'blur(3px)', 'blur(0px)', 'blur(0.3px)']
+        }}
+        transition={{ 
+          duration: 0.75, 
+          times: [0, 0.2, 0.25, 1], // Impact is perfectly aligned with shadow vanishing
+        }}
+      >
+        <svg width="180" height="180" viewBox="0 0 180 180" className="text-[var(--color-burgundy)] drop-shadow-sm">
+           <defs>
+              <filter id="distress" x="-10%" y="-10%" width="120%" height="120%">
+                <feTurbulence type="fractalNoise" baseFrequency="0.7" numOctaves="3" result="noise" />
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="3" xChannelSelector="R" yChannelSelector="G" result="displaced" />
+                {/* Add a tiny bit of opacity noise for texture without destroying legibility */}
+                <feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 2 -0.2" in="noise" result="opacityNoise" />
+                <feComposite operator="in" in="displaced" in2="opacityNoise" result="textured" />
+              </filter>
+              <path id="text-curve" d="M 42,95 A 48,48 0 0,0 138,95" fill="none" />
+           </defs>
+
+           <g filter="url(#distress)" fill="currentColor">
+             {/* Outer Rings */}
+             <circle cx="90" cy="90" r="70" fill="none" stroke="currentColor" strokeWidth="4" />
+             <circle cx="90" cy="90" r="62" fill="none" stroke="currentColor" strokeWidth="1.5" strokeDasharray="14 4" opacity="0.8" />
+             
+             {/* Flame Center */}
+             <g transform="translate(62, 32) scale(2.4)">
+               <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z" />
+             </g>
+
+             {/* Fragment Number inside the Flame Base */}
+             <text x="90" y="99" fontSize="18" fontFamily="var(--font-serif)" fontWeight="bold" textAnchor="middle" fill="var(--color-paper)" letterSpacing="0">
+               {fragmentNumber}
+             </text>
+
+             {/* Curved Text */}
+             <text fontSize="16" fontFamily="var(--font-sans)" fontWeight="700" letterSpacing="6" fill="currentColor">
+               <textPath href="#text-curve" startOffset="50%" textAnchor="middle">
+                 FRAGMENT
+               </textPath>
+             </text>
+           </g>
+        </svg>
+      </motion.div>
+    </motion.div>
   );
 }

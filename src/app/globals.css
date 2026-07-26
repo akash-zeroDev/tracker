@@ -107,6 +107,12 @@
   --sidebar-accent-foreground: oklch(0.208 0.042 265.755);
   --sidebar-border: oklch(0.929 0.013 255.508);
   --sidebar-ring: oklch(0.704 0.04 256.788);
+
+  /* Interaction System (Light) */
+  --selection-bg: color-mix(in oklch, var(--primary) 20%, transparent);
+  --selection-text: var(--foreground);
+  --caret-color: var(--primary);
+  --focus-ring-color: var(--primary);
 }
 
 .dark {
@@ -142,11 +148,38 @@
   --sidebar-accent-foreground: oklch(0.984 0.003 247.858);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.551 0.027 264.364);
+
+  /* Interaction System (Dark) */
+  --selection-bg: color-mix(in oklch, var(--primary) 20%, transparent);
+  --selection-text: var(--foreground);
+  --caret-color: var(--primary);
+  --focus-ring-color: var(--primary);
 }
 
 @layer base {
   * {
     border-color: var(--color-border);
+    /* Disable default tap highlight globally */
+    -webkit-tap-highlight-color: transparent;
+    /* Set global custom caret color */
+    caret-color: var(--caret-color);
+  }
+  
+  /* Global Selection Styles */
+  ::selection {
+    background-color: var(--selection-bg);
+    color: var(--selection-text);
+  }
+  ::-moz-selection {
+    background-color: var(--selection-bg);
+    color: var(--selection-text);
+  }
+
+  /* Global Universal Focus Ring */
+  *:focus-visible:not(.focus\:outline-none) {
+    outline: 1px solid var(--focus-ring-color) !important;
+    outline-offset: 3px !important;
+    box-shadow: none !important;
   }
 
   body {
@@ -407,4 +440,29 @@
     transform: none !important;
     opacity: 1 !important;
   }
+}
+
+/* Custom Archival Scrollbar (Forced global override) */
+/* Custom Archival Scrollbar (Forced global override) */
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+  background-color: var(--color-paper);
+}
+*::-webkit-scrollbar-track {
+  background: var(--color-paper);
+  border-left: 1px solid var(--color-rule);
+}
+*::-webkit-scrollbar-thumb {
+  background-color: var(--color-ink-soft);
+  border-radius: 4px;
+  border: 2px solid var(--color-paper);
+  background-clip: padding-box;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-burgundy);
+}
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  width: 10px;
 }
