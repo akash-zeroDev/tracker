@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from 'framer-motion';
 import { EditorialTime } from '@/components/ui/EditorialTime';
 import { addLogEntry, sendBackupEmail, toggleGoalVisibility } from "@/app/actions";
+import { CommandLineAccess } from "./CommandLineAccess";
 import { DestroyTracker } from "./DestroyTracker";
 import { GoalDescriptionEditor } from "./GoalDescriptionEditor";
 import { Flame, Trash2 } from 'lucide-react';
@@ -32,6 +33,13 @@ export interface GoalData {
     content: string | null;
     createdAt: Date;
   }>;
+  automation: {
+    isEnabled: boolean;
+    keyPrefix: string | null;
+    requestCount: number;
+    lastUsedAt: Date | null;
+    createdAt: Date;
+  } | null;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -956,6 +964,11 @@ export default function EditWorkspaceRedesign({ goal }: { goal: GoalData }) {
         {/* Full width — Recent fragments */}
         <div className="col-span-12 mt-2">
           <RecentFragments goal={goal} />
+        </div>
+
+        {/* Full width — Command Line Access */}
+        <div className="col-span-12 mt-6">
+          <CommandLineAccess goalId={goal.id} automation={goal.automation} />
         </div>
       </main>
 

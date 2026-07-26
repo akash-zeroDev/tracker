@@ -22,6 +22,7 @@ model Goal {
   lastLogDateText String?
   entries         LogEntry[]
   patina          GoalPatina?
+  automation      ArchiveAutomation?
 }
 
 model LogEntry {
@@ -45,4 +46,17 @@ model LogEntryPatina {
   entry       LogEntry @relation(fields: [entryId], references: [id], onDelete: Cascade)
   readCount   Int      @default(0)
   patinaScore Float    @default(0.0)
+}
+
+// Secure 1-to-1 table for per-tracker programmatic access (Command Line Access feature).
+// Raw keys are NEVER stored. Only the SHA-256 hash and metadata live here.
+model ArchiveAutomation {
+  goalId       String    @id
+  goal         Goal      @relation(fields: [goalId], references: [id], onDelete: Cascade)
+  hashedKey    String?   @unique
+  keyPrefix    String?                      // e.g. "pa_live_4f9a" — safe to display
+  isEnabled    Boolean   @default(false)
+  requestCount Int       @default(0)
+  lastUsedAt   DateTime?
+  createdAt    DateTime  @default(now())
 }

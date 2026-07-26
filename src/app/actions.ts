@@ -136,9 +136,11 @@ export async function getGoalById(id: string) {
       entries: {
         orderBy: { createdAt: 'desc' },
       },
+      automation: true,
     },
   });
 }
+
 
 const updateDescriptionSchema = z.object({
   id: z.string().uuid(),
@@ -312,4 +314,77 @@ export async function getAllEntries() {
       createdAt: 'desc'
     }
   });
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Command Line Access — Automation Key Management
+// Keys are generated with crypto.randomBytes, stored only as SHA-256 hashes.
+// The raw key is returned exactly once on generation and never persisted.
+// ─────────────────────────────────────────────────────────────────────────────
+import { createHash, randomBytes } from 'crypto';
+
+function generateRawKey(): string {
+  return 'pa_live_' + randomBytes(24).toString('hex');
+}
+
+function hashKey(raw: string): string {
+  return createHash('sha256').update(raw).digest('hex');
+}
+
+/** Enables Command Line Access for a folio. Returns the raw key (shown ONCE). */
+export async function enableAutomation(goalId: string): Promise<{ rawKey: string }> {
+  const rawKey = generateRawKey();
+  const hashed = hashKey(rawKey);
+  const prefix = rawKey.slice(0, 16); // "pa_live_XXXXXXXX"
+
+  await prisma.archiveAutomation.upsert({
+    where: { goalId },
+    update: {
+      hashedKey: hashed,
+      keyPrefix: prefix,
+      isEnabled: true,
+      lastUsedAt: null,
+      requestCount: 0,
+    },
+    create: {
+      goalId,
+      hashedKey: hashed,
+      keyPrefix: prefix,
+      isEnabled: true,
+    },
+  });
+
+  revalidatePath(`/edit/${goalId}`);
+  return { rawKey };
+}
+
+/** Disables (revokes) Command Line Access without deleting the record. */
+export async function disableAutomation(goalId: string): Promise<void> {
+  await prisma.archiveAutomation.upsert({
+    where: { goalId },
+    update: { isEnabled: false, hashedKey: null },
+    create: { goalId, isEnabled: false },
+  });
+  revalidatePath(`/edit/${goalId}`);
+}
+
+/** Rotates the API key. The old key is immediately invalidated. Returns new raw key (once). */
+export async function rotateAutomationKey(goalId: string): Promise<{ rawKey: string }> {
+  const rawKey = generateRawKey();
+  const hashed = hashKey(rawKey);
+  const prefix = rawKey.slice(0, 16);
+
+  await prisma.archiveAutomation.update({
+    where: { goalId },
+    data: {
+      hashedKey: hashed,
+      keyPrefix: prefix,
+      isEnabled: true,
+      requestCount: 0,
+      lastUsedAt: null,
+    },
+  });
+
+  revalidatePath(`/edit/${goalId}`);
+  return { rawKey };
 }
