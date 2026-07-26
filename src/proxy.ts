@@ -9,7 +9,7 @@ const ipMap = new Map<string, { count: number; timestamp: number }>();
 const RATE_LIMIT = 30; // Max requests
 const WINDOW_MS = 60 * 1000; // 1 minute
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   // We only rate-limit mutations (POST, PUT, DELETE)
   // This protects Server Actions (which use POST) and API routes
   // while allowing uninterrupted GET requests for page navigation.
