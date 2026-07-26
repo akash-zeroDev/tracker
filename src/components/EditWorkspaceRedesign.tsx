@@ -3,6 +3,7 @@
 import * as React from "react";
 import { Folder, Search, CheckCircle, Clock } from 'lucide-react';
 import { useRouter } from "next/navigation";
+import { motion, AnimatePresence } from 'framer-motion';
 import { addLogEntry, sendBackupEmail, toggleGoalVisibility } from "@/app/actions";
 import { DestroyTracker } from "./DestroyTracker";
 import { GoalDescriptionEditor } from "./GoalDescriptionEditor";
@@ -513,7 +514,7 @@ function MetadataLedger({ goal }: { goal: GoalData }) {
 
 function CalendarHeatmap({ goal }: { goal: GoalData }) {
   const [currentDate, setCurrentDate] = React.useState(() => new Date());
-  const [hoveredDay, setHoveredDay] = React.useState<{ date: string, count: number, x: number, y: number } | null>(null);
+  const [hoveredDay, setHoveredDay] = React.useState<{ date: string, count: number } | null>(null);
 
   // Group entries by YYYY-MM-DD
   const entriesByDate = React.useMemo(() => {
@@ -544,13 +545,32 @@ function CalendarHeatmap({ goal }: { goal: GoalData }) {
   const grid = Array.from({ length: startDayOfWeek }).map(() => null)
     .concat(Array.from({ length: daysInMonth }).map((_, i) => i + 1));
 
-  // Colors for GitHub-style intensity (Burgundy scale)
+  // Refined designer ink scale
   const getDotStyle = (count: number) => {
-    if (count === 0) return { background: 'transparent', border: '1px solid var(--color-rule)' };
-    if (count === 1) return { background: 'oklch(0.70 0.10 20)' }; // Light burgundy
-    if (count === 2) return { background: 'oklch(0.55 0.15 20)' }; // Medium
-    if (count === 3) return { background: 'oklch(0.40 0.18 20)' }; // Dark
-    return { background: 'var(--color-burgundy)' }; // Very dark
+    if (count === 0) return { 
+      background: 'transparent', 
+      border: '1px solid var(--color-rule)' 
+    };
+    if (count === 1) return { 
+      background: 'oklch(0.70 0.10 20)', 
+      boxShadow: 'inset 0 1px 1px oklch(1 1 1 / 0.2)',
+      border: '1px solid oklch(0.60 0.12 20)' 
+    };
+    if (count === 2) return { 
+      background: 'oklch(0.55 0.15 20)', 
+      boxShadow: 'inset 0 1px 1px oklch(1 1 1 / 0.2)',
+      border: '1px solid oklch(0.45 0.15 20)' 
+    };
+    if (count === 3) return { 
+      background: 'oklch(0.40 0.18 20)', 
+      boxShadow: 'inset 0 1px 1px oklch(1 1 1 / 0.15)',
+      border: '1px solid oklch(0.30 0.18 20)' 
+    };
+    return { 
+      background: 'var(--color-burgundy)', 
+      boxShadow: 'inset 0 1px 1px oklch(1 1 1 / 0.1)',
+      border: '1px solid oklch(0.2 0.1 20)' 
+    };
   };
 
   const filedThisMonth = Array.from({ length: daysInMonth }).map((_, i) => {
@@ -558,44 +578,92 @@ function CalendarHeatmap({ goal }: { goal: GoalData }) {
     return entriesByDate[key] || 0;
   }).reduce((a, b) => a + b, 0);
 
+  // Stagger animation container
+  const container = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: { staggerChildren: 0.015 }
+    }
+  };
+
+  const item = {
+    hidden: { opacity: 0, scale: 0.8 },
+    show: { opacity: 1, scale: 1, transition: { type: "spring", stiffness: 350, damping: 25 } }
+  };
+
   return (
     <section className="reveal reveal-delay-3 paper-sheet relative p-8 lg:p-10">
-      <div className="flex flex-wrap items-baseline justify-between gap-4">
+      <div className="flex flex-wrap items-baseline justify-between gap-4 relative z-10 min-h-[48px]">
         <SectionHeading
           index="§ III"
           title="The Calendar"
           hint="each dot · one day filed"
         />
-        <div className="flex items-baseline gap-6">
-          <div>
-            <Label>This Month</Label>
-            <div className="font-serif text-xl leading-none">
-              {filedThisMonth} <span className="text-[11px] text-[var(--color-ink-soft)]">logs</span>
-            </div>
-          </div>
+        
+        {/* Dynamic Editorial Metadata Panel */}
+        <div className="flex items-baseline gap-6 min-w-[140px] justify-end text-right">
+          <AnimatePresence mode="wait">
+            {hoveredDay ? (
+              <motion.div 
+                key="hovered"
+                initial={{ opacity: 0, y: 4 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -4 }}
+                transition={{ duration: 0.15 }}
+                className="flex flex-col items-end"
+              >
+                <Label>{new Date(hoveredDay.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</Label>
+                <div className="font-serif text-[22px] leading-none flex items-baseline gap-1.5 text-[var(--color-burgundy)]">
+                  {hoveredDay.count} <span className="text-[11px] text-[var(--color-ink-soft)] font-mono uppercase tracking-widest">logs</span>
+                </div>
+              </motion.div>
+            ) : (
+              <motion.div 
+                key="month"
+                initial={{ opacity: 0, y: 4 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -4 }}
+                transition={{ duration: 0.15 }}
+                className="flex flex-col items-end"
+              >
+                <Label>This Month</Label>
+                <div className="font-serif text-[22px] leading-none flex items-baseline gap-1.5">
+                  {filedThisMonth} <span className="text-[11px] text-[var(--color-ink-soft)] font-mono uppercase tracking-widest">logs</span>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
 
-      <FoldRule className="mt-6 mb-8" />
+      <FoldRule className="mt-4 mb-8 relative z-10" />
 
-      <div className="flex items-center justify-between mb-6">
-        <h3 className="font-serif text-2xl text-[var(--color-ink)]">
+      <div className="flex items-center justify-between mb-8 relative z-10">
+        <h3 className="font-serif text-[22px] md:text-2xl text-[var(--color-ink)] flex items-center gap-3">
+          <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-burgundy)] opacity-60" />
           {monthName} {year}
         </h3>
         <div className="flex gap-2">
-          <button onClick={prevMonth} className="p-2 text-[var(--color-ink-soft)] hover:text-[var(--color-ink)] transition-colors">
+          <button onClick={prevMonth} className="p-2 text-[var(--color-ink-soft)] hover:text-[var(--color-ink)] hover:bg-[var(--color-rule)]/50 rounded-full transition-all active:scale-95">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M15 18l-6-6 6-6"/></svg>
           </button>
-          <button onClick={nextMonth} disabled={isCurrentMonth} className={`p-2 transition-colors ${isCurrentMonth ? 'text-[var(--color-rule)] cursor-not-allowed' : 'text-[var(--color-ink-soft)] hover:text-[var(--color-ink)]'}`}>
+          <button onClick={nextMonth} disabled={isCurrentMonth} className={`p-2 rounded-full transition-all active:scale-95 ${isCurrentMonth ? 'text-[var(--color-rule)] cursor-not-allowed' : 'text-[var(--color-ink-soft)] hover:text-[var(--color-ink)] hover:bg-[var(--color-rule)]/50'}`}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M9 18l6-6-6-6"/></svg>
           </button>
         </div>
       </div>
 
-      <div className="relative">
-        <div className="grid grid-cols-7 gap-y-4 gap-x-2 md:gap-y-6 md:gap-x-4 mb-2">
+      <div className="relative z-10">
+        <motion.div 
+          key={`${year}-${month}`} 
+          variants={container} 
+          initial="hidden" 
+          animate="show" 
+          className="grid grid-cols-7 gap-y-4 gap-x-2 md:gap-y-6 md:gap-x-4 mb-2"
+        >
           {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-            <div key={day} className="text-center font-mono text-[10px] uppercase tracking-widest text-[var(--color-ink-soft)]">
+            <div key={day} className="text-center font-mono text-[9px] md:text-[10px] uppercase tracking-[0.15em] text-[var(--color-ink-soft)]">
               {day}
             </div>
           ))}
@@ -615,36 +683,26 @@ function CalendarHeatmap({ goal }: { goal: GoalData }) {
               <div 
                 key={`day-${day}`} 
                 className="relative flex justify-center items-center h-10 w-full"
-                onMouseEnter={(e) => {
-                  const rect = e.currentTarget.getBoundingClientRect();
-                  setHoveredDay({ date: dateKey, count, x: rect.left + rect.width / 2, y: rect.top });
-                }}
+                onMouseEnter={() => setHoveredDay({ date: dateKey, count })}
                 onMouseLeave={() => setHoveredDay(null)}
               >
-                <button
-                  className={`w-6 h-6 md:w-8 md:h-8 rounded-full transition-transform hover:scale-110 ${isToday ? 'ring-2 ring-[var(--color-ink)] ring-offset-2 ring-offset-[var(--color-paper)]' : ''}`}
+                <motion.button
+                  variants={item}
+                  whileHover={{ scale: 1.15, transition: { type: "spring", stiffness: 400, damping: 20 } }}
+                  whileTap={{ scale: 0.95 }}
+                  className={`relative w-6 h-6 md:w-[28px] md:h-[28px] rounded-full transition-shadow ${
+                    isToday 
+                      ? 'ring-1 ring-offset-[3px] ring-offset-[var(--color-paper)] ring-[var(--color-ink)]/30 shadow-[0_0_12px_rgba(0,0,0,0.03)]' 
+                      : ''
+                  }`}
                   style={style}
                   aria-label={`${dateKey}: ${count} logs`}
                 />
               </div>
             );
           })}
-        </div>
+        </motion.div>
       </div>
-
-      {/* Tooltip Overlay */}
-      {hoveredDay && (
-        <div 
-          className="fixed z-50 pointer-events-none transform -translate-x-1/2 -translate-y-full pb-2"
-          style={{ left: hoveredDay.x, top: hoveredDay.y }}
-        >
-          <div className="bg-[var(--color-ink)] text-[var(--color-paper)] px-3 py-1.5 rounded-[4px] shadow-lg text-[11px] font-mono whitespace-nowrap flex flex-col items-center">
-            <span className="opacity-80 mb-0.5">{new Date(hoveredDay.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
-            <span className="font-bold">{hoveredDay.count} log{hoveredDay.count !== 1 ? 's' : ''}</span>
-            <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-[var(--color-ink)] rotate-45" />
-          </div>
-        </div>
-      )}
     </section>
   );
 }
