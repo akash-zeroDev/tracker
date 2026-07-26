@@ -33,7 +33,7 @@ export function ArchiveManifest({
   const containerRef = useRef(null);
   const inView = useInView(containerRef, { once: true, margin: "-100px" });
   const [footnote, setFootnote] = useState<string>("Hover over a metric to view its archival record.");
-  const containerVariants = {
+  const containerVariants: any = {
     hidden: {},
     visible: {
       transition: {
@@ -41,7 +41,7 @@ export function ArchiveManifest({
       },
     },
   };
-  const itemVariants = {
+  const itemVariants: any = {
     hidden: { opacity: 0, y: 10 },
     visible: { 
       opacity: 1, 
@@ -49,7 +49,7 @@ export function ArchiveManifest({
       transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] } 
     },
   };
-  const lineVariants = {
+  const lineVariants: any = {
     hidden: { scaleX: 0, originX: 0 },
     visible: { 
       scaleX: 1,
@@ -136,7 +136,7 @@ export function ArchiveManifest({
                   onMouseLeave={() => setFootnote("Hover over a metric to view its archival record.")}
                 >
                   <div className="font-serif text-[2.5rem] leading-none text-[color:var(--color-ink)] transition-transform duration-500 ease-out group-hover:-translate-y-0.5">
-                    <Counter to={subjectsCount} duration={1.2} />
+                    <Counter to={subjectsCount || 0} duration={1.2} />
                   </div>
                   <div className="mt-3 flex justify-between items-end border-b border-[color:var(--color-rule)] pb-2 transition-colors duration-500 group-hover:border-[color:var(--color-ink)]">
                     <span className="font-sans uppercase tracking-[0.1em] text-[0.75rem] text-[color:var(--color-ink-soft)]">

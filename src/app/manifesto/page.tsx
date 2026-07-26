@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { Label, Stamp, RefId } from '@/components/AtelierPrimitives';
 import { InkText, InkBlock, InkRule } from '@/components/transitions/InkPrimitives';
 export default function ManifestoPage() {
-  const container = {
+  const container: any = {
     hidden: { opacity: 0 },
     show: {
       opacity: 1,
@@ -14,7 +14,7 @@ export default function ManifestoPage() {
       }
     }
   };
-  const item = {
+  const item: any = {
     hidden: { opacity: 0, y: 10, filter: 'blur(3px)' },
     show: { 
       opacity: 1, 

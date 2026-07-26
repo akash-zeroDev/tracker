@@ -41,7 +41,7 @@ function Counter({ to, duration = 1.5 }: { to: number; duration?: number }) {
   return <span ref={ref}>0</span>;
 }
 function Section01Stats({ stats }: { stats: any }) {
-  const containerVariants = {
+  const containerVariants: any = {
     hidden: {},
     visible: { transition: { staggerChildren: 0.15 } }
   };
@@ -81,7 +81,7 @@ function Volume({ vol, onWithdraw }: { vol: ArchiveVolumeData, onWithdraw: (v: A
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-50px" }}
-      transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] } as any}
       className={`group relative flex flex-col justify-end bg-[color:var(--color-paper-deep)] border border-[color:var(--color-rule)] cursor-pointer
         ${isFeatured ? 'md:col-span-2 lg:col-span-2 row-span-2 min-h-[500px]' : ''}
         ${!isFeatured && !isCompact ? 'col-span-1 row-span-2 min-h-[400px]' : ''}
