@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
+import { RefId } from '@/components/AtelierPrimitives';
+import { EditorialTime } from '@/components/ui/EditorialTime';
 
 export function PublicFragmentsList({ entries }: { entries: any[] }) {
   const [expanded, setExpanded] = useState(false);
@@ -23,7 +25,7 @@ export function PublicFragmentsList({ entries }: { entries: any[] }) {
         <article key={entry.id}>
           <div className="flex justify-between items-baseline">
             <span className="ref-id">CHAPTER · § {entries.length - index}</span>
-            <span className="ref-id opacity-60">{new Date(entry.createdAt).toLocaleDateString()}</span>
+            <EditorialTime date={entry.createdAt} context="compact" className="ref-id opacity-60" />
           </div>
           <h3 className="mt-3 font-serif text-[1.4rem] leading-[1.3] tracking-tight break-words whitespace-pre-wrap">
             {entry.content || 'Logged a streak without notes.'}

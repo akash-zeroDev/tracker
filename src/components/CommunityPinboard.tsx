@@ -1,6 +1,7 @@
 import * as React from "react";
 import { getCommunityFeed } from '@/app/actions';
 import Link from 'next/link';
+import { EditorialTime } from '@/components/ui/EditorialTime';
 
 type Kind = "index" | "slip" | "folded" | "tracing" | "bookmark";
 
@@ -13,7 +14,7 @@ export type Fragment = {
   topic: string;
   streak: number;
   fragment: string;
-  date: string;
+  date: string | React.ReactNode;
   kind: Kind;
   tilt: number; // degrees, |x| <= 1
   featured?: boolean;
@@ -497,7 +498,7 @@ export default async function CommunityPinboard() {
       topic: goal.title.split(' ')[0] || "Topic",
       streak: goal.currentStreak,
       fragment: entry?.content || "Goal initiated. Awaiting first fragment.",
-      date: new Date(goal.createdAt).toLocaleDateString('en-US', { day: 'numeric', month: 'short' }),
+      date: <EditorialTime date={goal.createdAt} context="compact" />,
       kind: shuffledKinds[idx] as Kind,
       tilt: randomTilt(),
       featured: idx === 0,

@@ -21,6 +21,7 @@ model Goal {
   longestStreak   Int         @default(0)
   lastLogDateText String?
   entries         LogEntry[]
+  patina          GoalPatina?
 }
 
 model LogEntry {
@@ -29,4 +30,19 @@ model LogEntry {
   goal      Goal     @relation(fields: [goalId], references: [id], onDelete: Cascade)
   content   String?
   createdAt DateTime @default(now())
+  patina    LogEntryPatina?
+}
+
+model GoalPatina {
+  goalId      String   @id
+  goal        Goal     @relation(fields: [goalId], references: [id], onDelete: Cascade)
+  readCount   Int      @default(0)
+  patinaScore Float    @default(0.0)
+}
+
+model LogEntryPatina {
+  entryId     String   @id
+  entry       LogEntry @relation(fields: [entryId], references: [id], onDelete: Cascade)
+  readCount   Int      @default(0)
+  patinaScore Float    @default(0.0)
 }

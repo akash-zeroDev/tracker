@@ -267,9 +267,23 @@ export async function deleteGoal(id: string) {
   const parsed = deleteGoalSchema.parse({ id });
 
   await prisma.goal.delete({
-    where: { id: parsed.id },
+    where: { id: parsed.id }
   });
+  return { success: true };
+}
 
+const deleteLogEntrySchema = z.object({
+  id: z.string().min(1),
+});
+
+export async function deleteLogEntry(id: string) {
+  const parsed = deleteLogEntrySchema.parse({ id });
+  
+  await prisma.logEntry.delete({
+    where: { id: parsed.id }
+  });
+  
+  revalidatePath('/');
   return { success: true };
 }
 

@@ -1,0 +1,67 @@
+import { differenceInSeconds, differenceInMinutes, differenceInHours, isYesterday, isThisYear, format, differenceInDays } from 'date-fns';
+
+export type TimeContext = 'compact' | 'footer' | 'header' | 'timeline' | 'feed' | 'metadata';
+
+interface FormatOptions {
+  context?: TimeContext;
+  action?: string; // e.g., "Filed", "Revised"
+}
+
+export function formatEditorialTime(dateInput: Date | string | number, options: FormatOptions = {}): string {
+  const date = new Date(dateInput);
+  
+  // Guard against invalid dates
+  if (isNaN(date.getTime())) return 'Unknown date';
+
+  const now = new Date();
+  const { context = 'feed', action } = options;
+
+  // 1. Absolute Contexts (Never relative)
+  if (context === 'timeline') {
+    return format(date, 'MMMM d, h:mm a');
+  }
+  if (context === 'metadata') {
+    return format(date, 'MMMM d, yyyy');
+  }
+  if (context === 'header') {
+    const actionPrefix = action ? `${action}\n` : '';
+    return `${actionPrefix}${format(date, 'MMMM d, yyyy')}`;
+  }
+
+  // 2. Relative / Editorial Contexts
+  const seconds = differenceInSeconds(now, date);
+  const minutes = differenceInMinutes(now, date);
+  const hours = differenceInHours(now, date);
+  const days = differenceInDays(now, date);
+
+  let timeString = '';
+
+  if (seconds < 60) {
+    timeString = context === 'compact' ? 'Now' : 'Just now';
+  } else if (minutes < 60) {
+    timeString = context === 'compact' ? `${minutes}m` : `${minutes} min ago`;
+  } else if (hours < 24 && !isYesterday(date)) {
+    timeString = context === 'compact' ? `${hours}h` : `${hours} hour${hours !== 1 ? 's' : ''} ago`;
+  } else if (isYesterday(date)) {
+    timeString = 'Yesterday';
+  } else if (days < 7) {
+    timeString = format(date, 'EEEE'); // e.g., "Monday"
+  } else if (isThisYear(date)) {
+    timeString = context === 'compact' ? format(date, 'MMM d') : format(date, 'MMMM d'); // "Mar 14" or "March 14"
+  } else {
+    timeString = context === 'compact' ? format(date, 'MMM d, yy') : format(date, 'MMMM d, yyyy');
+  }
+
+  // Combine with action if provided
+  if (action && (context === 'footer' || context === 'feed')) {
+    return `${action} ${timeString}`;
+  }
+
+  return timeString;
+}
+
+export function formatAbsolute(dateInput: Date | string | number): string {
+  const date = new Date(dateInput);
+  if (isNaN(date.getTime())) return '';
+  return format(date, 'MMMM d, yyyy, h:mm a');
+}

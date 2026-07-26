@@ -4,7 +4,7 @@ import React from 'react';
 import { useTrackers } from '@/hooks/useTrackers';
 import { Copy, ExternalLink, Trash2 } from 'lucide-react';
 import Link from 'next/link';
-import { formatDistanceToNow } from 'date-fns';
+import { EditorialTime } from '@/components/ui/EditorialTime';
 
 export function RecentTrackers() {
   const { trackers, isLoaded, removeTracker } = useTrackers();
@@ -50,9 +50,12 @@ export function RecentTrackers() {
 
             <div>
               <h3 className="truncate pr-8 text-lg font-semibold">{tracker.title}</h3>
-              <p className="mt-1 text-xs text-white/50">
-                Opened {formatDistanceToNow(tracker.lastOpened, { addSuffix: true })}
-              </p>
+              <EditorialTime 
+                date={tracker.lastOpened} 
+                context="footer" 
+                action="Opened" 
+                className="mt-1 block text-xs text-white/50" 
+              />
             </div>
 
             <div className="flex items-center justify-between border-t border-white/5 pt-2">

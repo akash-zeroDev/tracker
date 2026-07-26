@@ -1,7 +1,9 @@
 'use client';
 
 import React, { useState, useEffect, useTransition } from 'react';
+import Link from "next/link";
 import { sendBackupEmail } from '@/app/actions';
+import { EditorialTime } from '@/components/ui/EditorialTime';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Stamp } from '@/components/AtelierPrimitives';
 
@@ -71,7 +73,7 @@ export function LibraryCard({ goalId, publicSlug, createdAt }: LibraryCardProps)
             <span className="font-mono text-[0.65rem] uppercase tracking-widest opacity-60">Library / Archive Card</span>
             <span className="font-serif italic text-[1.1rem]">Publication Details</span>
           </div>
-          <span className="font-mono text-[0.7rem] uppercase">{new Date(createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
+          <EditorialTime date={createdAt} context="compact" className="font-mono text-[0.7rem] uppercase" />
         </div>
 
         {/* Public Link Row (Library Check-out) */}

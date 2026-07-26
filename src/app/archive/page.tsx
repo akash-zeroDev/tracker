@@ -47,7 +47,7 @@ export default async function ArchivePage() {
       id: g.id,
       volNumber: getRomanVol(i),
       title: g.title,
-      archivedDate: new Date(g.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
+      archivedDate: new Date(g.createdAt).toISOString(),
       duration,
       totalEntries: g.entries.length,
       longestStreak: g.longestStreak,

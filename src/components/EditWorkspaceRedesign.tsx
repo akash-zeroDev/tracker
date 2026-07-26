@@ -4,9 +4,12 @@ import * as React from "react";
 import { Folder, Search, CheckCircle, Clock } from 'lucide-react';
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from 'framer-motion';
+import { EditorialTime } from '@/components/ui/EditorialTime';
 import { addLogEntry, sendBackupEmail, toggleGoalVisibility } from "@/app/actions";
 import { DestroyTracker } from "./DestroyTracker";
 import { GoalDescriptionEditor } from "./GoalDescriptionEditor";
+import { Flame, Trash2 } from 'lucide-react';
+import { deleteLogEntry } from '@/app/actions';
 import { GoalCategoryEditor } from "./GoalCategoryEditor";
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -73,7 +76,6 @@ function SectionHeading({
 
 function VolumePlate({ goal }: { goal: GoalData }) {
   const ageDays = Math.max(1, Math.floor((Date.now() - new Date(goal.createdAt).getTime()) / (1000 * 60 * 60 * 24)));
-  const opened = new Date(goal.createdAt).toLocaleDateString('en-GB', { year: 'numeric', month: 'short', day: '2-digit' }).replace(/ /g, ' · ');
   const shelf = goal.id.slice(0, 2).toUpperCase();
   const accession = goal.id.split('-')[0].toUpperCase();
 
@@ -110,7 +112,7 @@ function VolumePlate({ goal }: { goal: GoalData }) {
       <div className="pt-8 mt-8 border-t border-[var(--color-rule)]">
         <div className="flex items-center justify-between">
           <Label>Opened</Label>
-          <Ref>{opened}</Ref>
+          <Ref><EditorialTime date={goal.createdAt} context="compact" /></Ref>
         </div>
       </div>
     </aside>
@@ -154,11 +156,25 @@ function useCountUp(target: number, ms = 700) {
 function WritingSurface({ goal }: { goal: GoalData }) {
   const [text, setText] = React.useState("");
   const [isPending, startTransition] = React.useTransition();
+  const [exitIntentFlash, setExitIntentFlash] = React.useState(false);
   const router = useRouter();
   
   const words = text.trim() ? text.trim().split(/\s+/).length : 0;
   const today = new Date();
   const dateLabel = formatArchivalDate(today);
+
+  React.useEffect(() => {
+    const handleMouseLeave = (e: MouseEvent) => {
+      // Trigger if mouse leaves viewport at the top and there's unsaved text
+      if (e.clientY <= 0 && text.trim().length > 0 && !isPending) {
+        setExitIntentFlash(true);
+        setTimeout(() => setExitIntentFlash(false), 2500);
+      }
+    };
+    
+    document.addEventListener("mouseleave", handleMouseLeave);
+    return () => document.removeEventListener("mouseleave", handleMouseLeave);
+  }, [text, isPending]);
 
   const handleFileFragment = () => {
     if (!text.trim() || isPending) return;
@@ -189,10 +205,28 @@ function WritingSurface({ goal }: { goal: GoalData }) {
       <FoldRule className="mt-6" />
 
       {/* Ruled writing area */}
-      <div className="relative mt-8">
+      <div 
+        className={`relative mt-8 rounded-[4px] transition-all duration-500 ease-out ${
+          exitIntentFlash ? 'ring-2 ring-[var(--color-burgundy)] bg-[var(--color-burgundy)]/5' : 'ring-1 ring-transparent'
+        }`}
+      >
+        <AnimatePresence>
+          {exitIntentFlash && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              className="absolute -top-12 right-0 bg-[var(--color-burgundy)] text-[var(--color-paper)] font-mono text-[0.7rem] uppercase tracking-widest px-4 py-2 shadow-lg z-20 flex items-center gap-2 rounded-sm"
+            >
+              <span className="w-2 h-2 rounded-full bg-red-400 animate-pulse" />
+              Unfiled Manuscript
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0 rounded-[2px]"
+          className="pointer-events-none absolute inset-0 rounded-[4px]"
           style={{
             backgroundImage:
               "repeating-linear-gradient(to bottom, transparent, transparent 31px, oklch(0.82 0.02 80 / 0.35) 32px)",
@@ -476,12 +510,9 @@ function VaultDeposit({ goal }: { goal: GoalData }) {
 }
 
 function MetadataLedger({ goal }: { goal: GoalData }) {
-  const createdDate = new Date(goal.createdAt).toLocaleDateString('en-GB', { year: 'numeric', month: 'short', day: '2-digit' }).replace(/ /g, ' · ');
-  const lastFiled = goal.entries.length > 0 ? new Date(goal.entries[0].createdAt).toLocaleDateString('en-GB') : "Never";
-  
-  const rows: Array<[string, string]> = [
-    ["Created", createdDate],
-    ["Last filed", lastFiled],
+  const rows: Array<[string, React.ReactNode]> = [
+    ["Created", <EditorialTime key="c" date={goal.createdAt} context="metadata" />],
+    ["Last filed", goal.entries.length > 0 ? <EditorialTime key="l" date={goal.entries[0].createdAt} context="metadata" /> : "Never"],
     ["Visibility", goal.isPublic ? "Public" : "Private"],
     ["Status", goal.status === 'ACTIVE' ? "In progress" : "Archived"],
     ["Language", "en · gb"],
@@ -613,7 +644,7 @@ function CalendarHeatmap({ goal }: { goal: GoalData }) {
                 transition={{ duration: 0.15 }}
                 className="flex flex-col items-end"
               >
-                <Label>{new Date(hoveredDay.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</Label>
+                <Label><EditorialTime date={hoveredDay.date} context="metadata" /></Label>
                 <div className="font-serif text-[22px] leading-none flex items-baseline gap-1.5 text-[var(--color-burgundy)]">
                   {hoveredDay.count} <span className="text-[11px] text-[var(--color-ink-soft)] font-mono uppercase tracking-widest">logs</span>
                 </div>
@@ -713,37 +744,92 @@ function CalendarHeatmap({ goal }: { goal: GoalData }) {
 
 function RecentFragments({ goal }: { goal: GoalData }) {
   const [expanded, setExpanded] = React.useState(false);
+  const [strikingIds, setStrikingIds] = React.useState<Set<string>>(new Set());
+  const router = useRouter();
+  
   const displayedEntries = expanded ? goal.entries : goal.entries.slice(0, 5);
+
+  const handleDeleteEntry = (id: string) => {
+    setStrikingIds(prev => new Set(prev).add(id));
+    setTimeout(async () => {
+      try {
+        await deleteLogEntry(id);
+        router.refresh();
+      } catch (e) {
+        console.error("Failed to delete entry", e);
+        // Remove from striking if failed
+        setStrikingIds(prev => {
+          const next = new Set(prev);
+          next.delete(id);
+          return next;
+        });
+      }
+    }, 600); // Wait for red pen strike animation
+  };
 
   return (
     <section className="reveal reveal-delay-3 paper-sheet p-8 lg:p-10">
       <SectionHeading index="§ IV" title="Recent fragments" hint="most recent first" />
       <FoldRule className="mt-6" />
       <ul className="mt-2 divide-y divide-[var(--color-rule)]">
-        {goal.entries.length === 0 && (
-          <li className="py-6 text-center font-serif italic text-[var(--color-ink-soft)]">
-            The archive is empty. Begin writing above.
-          </li>
-        )}
-        {displayedEntries.map((e, index) => (
-          <li key={e.id} className="row-hover group -mx-3 grid grid-cols-12 gap-6 px-3 py-6">
-            <div className="col-span-12 sm:col-span-2 flex flex-col gap-1">
-              <Ref>E-{e.id.split('-')[0].toUpperCase()}</Ref>
-              <div className="font-mono text-[11px] tracking-[0.14em] text-[var(--color-ink-soft)]">
-                {new Date(e.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}
+        <AnimatePresence>
+          {goal.entries.length === 0 && (
+            <motion.li 
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              className="py-6 text-center font-serif italic text-[var(--color-ink-soft)]"
+            >
+              The archive is empty. Begin writing above.
+            </motion.li>
+          )}
+          {displayedEntries.map((e, index) => (
+            <motion.li 
+              key={e.id} 
+              layout
+              initial={{ opacity: 1, height: 'auto' }}
+              animate={{ opacity: strikingIds.has(e.id) ? 0.6 : 1 }}
+              exit={{ opacity: 0, height: 0, overflow: 'hidden' }}
+              transition={{ duration: 0.4 }}
+              className="row-hover group -mx-3 grid grid-cols-12 gap-6 px-3 py-6"
+            >
+              <div className="col-span-12 sm:col-span-2 flex flex-col gap-1">
+                <Ref>E-{e.id.split('-')[0].toUpperCase()}</Ref>
+                <div className="font-mono text-[11px] tracking-[0.14em] text-[var(--color-ink-soft)]">
+                  <EditorialTime date={e.createdAt} context="compact" />
+                </div>
               </div>
-            </div>
-            <div className="col-span-12 sm:col-span-10">
-              <div className="flex items-baseline gap-3">
-                <span className="bookmark" aria-hidden />
-                <h4 className="font-serif text-[19px] leading-tight">Folio · {goal.entries.length - index}</h4>
+              <div className="col-span-12 sm:col-span-10">
+                <div className="flex items-baseline justify-between w-full">
+                  <div className="flex items-baseline gap-3">
+                    <span className="bookmark" aria-hidden />
+                    <h4 className="font-serif text-[19px] leading-tight">Folio · {goal.entries.length - index}</h4>
+                  </div>
+                  <button
+                    onClick={() => handleDeleteEntry(e.id)}
+                    title="Incinerate Fragment"
+                    disabled={strikingIds.has(e.id)}
+                    className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 p-1.5 text-[color:var(--color-ink-soft)] hover:text-[color:var(--color-burgundy)] rounded-full hover:bg-[color:var(--color-burgundy)]/10 disabled:opacity-0"
+                  >
+                    <Flame className="w-4 h-4" />
+                  </button>
+                </div>
+                
+                <div className="relative mt-2 max-w-[62ch]">
+                  <p className={`font-serif text-[15px] leading-7 text-[var(--color-ink)] whitespace-pre-wrap transition-opacity duration-500 ${strikingIds.has(e.id) ? 'opacity-30' : ''}`}>
+                    {e.content}
+                  </p>
+                  
+                  {/* Ledger Strikethrough Animation (Red Pen) */}
+                  <motion.div
+                    initial={{ scaleX: 0 }}
+                    animate={{ scaleX: strikingIds.has(e.id) ? 1 : 0 }}
+                    transition={{ duration: 0.5, ease: "easeOut" }}
+                    className="absolute top-1/2 left-0 right-0 h-[2px] bg-[color:var(--color-burgundy)] origin-left pointer-events-none mix-blend-multiply"
+                  />
+                </div>
               </div>
-              <p className="mt-2 max-w-[62ch] font-serif text-[15px] leading-7 text-[var(--color-ink)] whitespace-pre-wrap">
-                {e.content}
-              </p>
-            </div>
-          </li>
-        ))}
+            </motion.li>
+          ))}
+        </AnimatePresence>
       </ul>
       <FoldRule className="mt-2" />
       <div className="mt-6 flex items-center justify-between">

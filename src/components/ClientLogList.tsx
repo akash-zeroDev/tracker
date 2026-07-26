@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import { formatDistanceToNow, format } from 'date-fns';
+import { format } from 'date-fns';
 import { Label, RefId } from '@/components/AtelierPrimitives';
+import { EditorialTime } from '@/components/ui/EditorialTime';
 
 interface ClientLogListProps {
   entries: {
@@ -43,9 +44,11 @@ export function ClientLogList({ entries }: ClientLogListProps) {
                 <div className="mt-3 font-mono text-[0.85rem] text-[color:var(--color-ink)]">
                   {format(new Date(e.createdAt), 'dd MMM yyyy')}
                 </div>
-                <div className="mt-4 label-caps opacity-60">
-                  {formatDistanceToNow(new Date(e.createdAt))} ago
-                </div>
+                <EditorialTime 
+                  date={e.createdAt} 
+                  context="feed" 
+                  className="mt-4 block label-caps opacity-60" 
+                />
               </div>
               <div className="col-span-12 md:col-span-7">
                 <p className="font-serif text-[1.1rem] leading-[1.75] text-[color:var(--color-ink)] whitespace-pre-wrap">

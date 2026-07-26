@@ -4,6 +4,9 @@ import React, { useRef, useState, useEffect } from 'react';
 import { motion, useInView, animate, AnimatePresence } from 'framer-motion';
 import { Stamp } from '@/components/AtelierPrimitives';
 import Link from 'next/link';
+import { EditorialTime } from '@/components/ui/EditorialTime';
+import { Trash2 } from 'lucide-react';
+import { FolioWithdrawalNotice } from './FolioWithdrawalNotice';
 
 /* ————— TYPES ————— */
 
@@ -86,7 +89,7 @@ function Section01Stats({ stats }: { stats: any }) {
 
 /* ————— THE VOLUME (BOOK) COMPONENT ————— */
 
-function Volume({ vol }: { vol: ArchiveVolumeData }) {
+function Volume({ vol, onWithdraw }: { vol: ArchiveVolumeData, onWithdraw: (v: ArchiveVolumeData) => void }) {
   const isFeatured = vol.size === 'featured';
   const isCompact = vol.size === 'compact';
 
@@ -152,8 +155,8 @@ function Volume({ vol }: { vol: ArchiveVolumeData }) {
           {/* Archival Record Details */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-6 border-t border-[color:var(--color-rule)] opacity-60 group-hover:opacity-100 transition-opacity duration-300">
             <div className="flex flex-col">
-              <span className="font-mono text-[0.6rem] tracking-widest uppercase mb-1">Archived</span>
-              <span className="font-serif text-[0.95rem]">{vol.archivedDate}</span>
+              <span className="font-mono text-[0.6rem] tracking-widest uppercase mb-1">Recorded</span>
+              <EditorialTime date={vol.archivedDate} context="metadata" className="font-serif text-[0.95rem]" />
             </div>
             <div className="flex flex-col">
               <span className="font-mono text-[0.6rem] tracking-widest uppercase mb-1">Duration</span>
@@ -176,8 +179,21 @@ function Volume({ vol }: { vol: ArchiveVolumeData }) {
 
       </div>
 
+      {/* Delete / Discard Button (Absolute Bottom Right) */}
+      <button 
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          onWithdraw(vol);
+        }}
+        title="Discard Folio"
+        className="absolute bottom-8 right-8 z-20 opacity-0 group-hover:opacity-100 transition-all duration-300 p-2.5 text-[color:var(--color-ink-soft)] hover:text-[color:var(--color-burgundy)] rounded-full hover:bg-[color:var(--color-burgundy)]/10"
+      >
+        <Trash2 className="w-4 h-4" />
+      </button>
+
       {/* Hover Shadow */}
-      <div className="absolute -bottom-4 left-4 right-4 h-4 bg-black/5 blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-500 ease-out rounded-full" />
+      <div className="absolute -bottom-4 left-4 right-4 h-4 bg-black/5 blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-500 ease-out rounded-full z-0" />
     </motion.div>
   );
 }
@@ -226,6 +242,7 @@ export function ArchiveClient({ volumes, stats }: { volumes: ArchiveVolumeData[]
   const [searchQuery, setSearchQuery] = useState("");
   const [visibleCount, setVisibleCount] = useState(7);
   const [sortBy, setSortBy] = useState<"Newest" | "Oldest" | "Longest" | "Entries" | "Alphabetical">("Newest");
+  const [folioToWithdraw, setFolioToWithdraw] = useState<ArchiveVolumeData | null>(null);
 
   let filteredVolumes = [...volumes];
   
@@ -304,7 +321,7 @@ export function ArchiveClient({ volumes, stats }: { volumes: ArchiveVolumeData[]
       {/* The Library Shelf */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 auto-rows-min">
         {filteredVolumes.slice(0, visibleCount).map((vol) => (
-          <Volume key={vol.id} vol={vol} />
+          <Volume key={vol.id} vol={vol} onWithdraw={setFolioToWithdraw} />
         ))}
       </div>
 
@@ -335,6 +352,14 @@ export function ArchiveClient({ volumes, stats }: { volumes: ArchiveVolumeData[]
         <Stamp>END OF COLLECTION</Stamp>
       </div>
 
+      {folioToWithdraw && (
+        <FolioWithdrawalNotice
+          folio={folioToWithdraw}
+          isOpen={!!folioToWithdraw}
+          onClose={() => setFolioToWithdraw(null)}
+          onSuccess={() => setFolioToWithdraw(null)}
+        />
+      )}
     </main>
   );
 }
