@@ -1,11 +1,11 @@
 'use server';
-import { PrismaClient } from '@prisma/client';
+
 import { formatInTimeZone } from 'date-fns-tz';
 import nodemailer from 'nodemailer';
 import { z } from 'zod';
 import { revalidatePath } from 'next/cache';
 import DOMPurify from 'isomorphic-dompurify';
-const prisma = new PrismaClient();
+import prisma from '@/lib/prisma';
 function generateSlug(title: string) {
   const base = title
     .toLowerCase()
