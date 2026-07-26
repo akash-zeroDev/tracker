@@ -5,6 +5,8 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 import { Label, RefId } from '@/components/AtelierPrimitives';
 import { PublicFragmentsList } from '@/components/PublicFragmentsList';
+
+export const revalidate = 86400; // 24 hours ISR caching
 export async function generateMetadata(
   props: { params: Promise<{ slug: string }> }
 ): Promise<Metadata> {

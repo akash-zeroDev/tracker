@@ -52,7 +52,7 @@ export async function addLogEntry(goalId: string, content?: string, clientTimezo
   const now = new Date();
   const currentLocalDateStr = formatInTimeZone(now, tz, 'yyyy-MM-dd');
   return await prisma.$transaction(async (tx) => {
-    const goals = await tx.$queryRaw<{ id: string; currentStreak: number; longestStreak: number; lastLogDateText: string | null }[]>`
+    const goals = await tx.$queryRaw<{ id: string; publicSlug: string; currentStreak: number; longestStreak: number; lastLogDateText: string | null }[]>`
       SELECT * FROM "Goal" WHERE id = ${goalId} FOR UPDATE
     `;
     if (!goals || goals.length === 0) throw new Error('Goal not found');
@@ -80,6 +80,10 @@ export async function addLogEntry(goalId: string, content?: string, clientTimezo
         content: parsed.content ? DOMPurify.sanitize(parsed.content.trim()) : null,
       },
     });
+    
+    // Asynchronously trigger ISR revalidation for the public slug
+    revalidatePath(`/${goal.publicSlug}`, 'page');
+    
     return entry;
   });
 }
