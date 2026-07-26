@@ -16,47 +16,48 @@
   --radius-2xl: calc(var(--radius) + 8px);
   --radius-3xl: calc(var(--radius) + 12px);
   --radius-4xl: calc(var(--radius) + 16px);
+  
+  /* Background / Paper Colors (Never animate) */
   --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-paper: var(--paper);
+  --color-paper-deep: var(--paper-deep);
   --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
   --color-popover: var(--popover);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
+
+  /* Static Ink Colors (Animated via explicit components now) */
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-rule: var(--rule);
+  --color-burgundy: var(--burgundy);
+  --color-olive: var(--olive);
+  --color-dust: var(--dust);
+
+  /* Mappings */
+  --color-foreground: var(--color-ink);
+  --color-card-foreground: var(--color-ink);
+  --color-popover-foreground: var(--color-ink);
+  --color-primary: var(--color-burgundy);
+  --color-primary-foreground: var(--color-paper);
+  --color-secondary: var(--color-paper-deep);
+  --color-secondary-foreground: var(--color-ink);
+  --color-muted: var(--color-paper-deep);
+  --color-muted-foreground: var(--color-ink-soft);
+  --color-accent: var(--color-olive);
+  --color-accent-foreground: var(--color-paper);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
-  --color-ring-offset-background: var(--background);
+  --color-border: var(--color-rule);
+  --color-input: var(--color-rule);
+  --color-ring: var(--color-burgundy);
+
+  /* Charts */
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
   --color-chart-3: var(--chart-3);
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
-  --color-sidebar: var(--sidebar);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-ring: var(--sidebar-ring);
-  --color-paper: var(--paper);
-  --color-paper-deep: var(--paper-deep);
-  --color-ink: var(--ink);
-  --color-ink-soft: var(--ink-soft);
-  --color-rule: var(--rule);
-  --color-olive: var(--olive);
-  --color-burgundy: var(--burgundy);
-  --color-dust: var(--dust);
+  
+  /* Fonts */
   --font-serif: var(--font-serif), "Iowan Old Style", Georgia, serif;
   --font-sans: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-mono), ui-monospace, SFMono-Regular, monospace;

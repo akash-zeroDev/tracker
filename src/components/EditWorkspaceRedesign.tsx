@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from "react";
+import { Folder, Search, CheckCircle, Clock } from 'lucide-react';
 import { useRouter } from "next/navigation";
 import { addLogEntry, sendBackupEmail, toggleGoalVisibility } from "@/app/actions";
 import { DestroyTracker } from "./DestroyTracker";
@@ -11,7 +12,7 @@ import { GoalCategoryEditor } from "./GoalCategoryEditor";
 // Types
 // ─────────────────────────────────────────────────────────────────────────────
 
-interface GoalData {
+export interface GoalData {
   id: string;
   publicSlug: string;
   title: string;
@@ -506,177 +507,146 @@ function MetadataLedger({ goal }: { goal: GoalData }) {
     </div>
   );
 }
-
 // ─────────────────────────────────────────────────────────────────────────────
 // Progress — The "Shelf Index" archive visualization
 // ─────────────────────────────────────────────────────────────────────────────
 
-function ShelfIndex({ goal }: { goal: GoalData }) {
-  const [hover, setHover] = React.useState<number | null>(null);
-  
-  // Deterministic heatmap from actual entries
-  const total = 18 * 7; // 126 days
-  const heatmap = React.useMemo(() => {
-    const map = new Array(total).fill(0);
+function CalendarHeatmap({ goal }: { goal: GoalData }) {
+  const [currentDate, setCurrentDate] = React.useState(() => new Date());
+  const [hoveredDay, setHoveredDay] = React.useState<{ date: string, count: number, x: number, y: number } | null>(null);
+
+  // Group entries by YYYY-MM-DD
+  const entriesByDate = React.useMemo(() => {
+    const map: Record<string, number> = {};
     goal.entries.forEach(entry => {
-      const daysAgo = Math.floor((Date.now() - new Date(entry.createdAt).getTime()) / (1000 * 60 * 60 * 24));
-      const index = total - 1 - daysAgo;
-      if (index >= 0 && index < total) {
-        map[index] += 1;
-      }
+      const d = new Date(entry.createdAt);
+      const dateKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      map[dateKey] = (map[dateKey] || 0) + 1;
     });
     return map;
   }, [goal.entries]);
 
-  const filed = heatmap.filter((v) => v > 0).length;
-  
-  // Helper to map weight (0-max) to 0, 1, 2, 3 for styling
-  const normalizeWeight = (v: number) => {
-    if (v === 0) return 0;
-    if (v === 1) return 1;
-    if (v === 2) return 2;
-    return 3;
+  const year = currentDate.getFullYear();
+  const month = currentDate.getMonth();
+
+  const startOfMonth = new Date(year, month, 1);
+  const endOfMonth = new Date(year, month + 1, 0);
+  const daysInMonth = endOfMonth.getDate();
+  const startDayOfWeek = startOfMonth.getDay(); // 0 = Sunday
+
+  const monthName = currentDate.toLocaleString('default', { month: 'long' });
+
+  const prevMonth = () => setCurrentDate(new Date(year, month - 1, 1));
+  const nextMonth = () => setCurrentDate(new Date(year, month + 1, 1));
+  const isCurrentMonth = new Date().getFullYear() === year && new Date().getMonth() === month;
+
+  // Build grid: pad with nulls for empty days at start
+  const grid = Array.from({ length: startDayOfWeek }).map(() => null)
+    .concat(Array.from({ length: daysInMonth }).map((_, i) => i + 1));
+
+  // Colors for GitHub-style intensity (Burgundy scale)
+  const getDotStyle = (count: number) => {
+    if (count === 0) return { background: 'transparent', border: '1px solid var(--color-rule)' };
+    if (count === 1) return { background: 'oklch(0.70 0.10 20)' }; // Light burgundy
+    if (count === 2) return { background: 'oklch(0.55 0.15 20)' }; // Medium
+    if (count === 3) return { background: 'oklch(0.40 0.18 20)' }; // Dark
+    return { background: 'var(--color-burgundy)' }; // Very dark
   };
 
+  const filedThisMonth = Array.from({ length: daysInMonth }).map((_, i) => {
+    const key = `${year}-${String(month + 1).padStart(2, '0')}-${String(i + 1).padStart(2, '0')}`;
+    return entriesByDate[key] || 0;
+  }).reduce((a, b) => a + b, 0);
+
   return (
-    <section className="reveal reveal-delay-3 paper-sheet relative overflow-hidden p-8 lg:p-10">
+    <section className="reveal reveal-delay-3 paper-sheet relative p-8 lg:p-10">
       <div className="flex flex-wrap items-baseline justify-between gap-4">
         <SectionHeading
           index="§ III"
-          title="The Shelf"
-          hint="each spine · one day filed"
+          title="The Calendar"
+          hint="each dot · one day filed"
         />
         <div className="flex items-baseline gap-6">
           <div>
-            <Label>Filed</Label>
+            <Label>This Month</Label>
             <div className="font-serif text-xl leading-none">
-              {filed}
-              <span className="text-[11px] text-[var(--color-ink-soft)]">/{total}</span>
-            </div>
-          </div>
-          <div>
-            <Label>Cadence</Label>
-            <div className="font-serif text-xl leading-none">
-              {Math.round((filed / total) * 100)}%
+              {filedThisMonth} <span className="text-[11px] text-[var(--color-ink-soft)]">logs</span>
             </div>
           </div>
         </div>
       </div>
 
-      <FoldRule className="mt-6" />
+      <FoldRule className="mt-6 mb-8" />
 
-      <div className="relative mt-10">
-        <div
-          aria-hidden
-          className="absolute bottom-0 left-0 right-0 h-[6px]"
-          style={{
-            background: "linear-gradient(180deg, oklch(0.72 0.03 80), oklch(0.55 0.04 60))",
-            boxShadow: "0 1px 0 oklch(1 0 0 / 0.5) inset, 0 6px 10px -6px oklch(0.2 0.02 80 / 0.5)",
-          }}
-        />
-        <div
-          aria-hidden
-          className="absolute -bottom-2 left-0 right-0 h-[2px] bg-[var(--color-rule)]"
-        />
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="font-serif text-2xl text-[var(--color-ink)]">
+          {monthName} {year}
+        </h3>
+        <div className="flex gap-2">
+          <button onClick={prevMonth} className="p-2 text-[var(--color-ink-soft)] hover:text-[var(--color-ink)] transition-colors">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+          <button onClick={nextMonth} disabled={isCurrentMonth} className={`p-2 transition-colors ${isCurrentMonth ? 'text-[var(--color-rule)] cursor-not-allowed' : 'text-[var(--color-ink-soft)] hover:text-[var(--color-ink)]'}`}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M9 18l6-6-6-6"/></svg>
+          </button>
+        </div>
+      </div>
 
-        <div className="flex h-56 items-end gap-[3px]">
-          {heatmap.map((rawVal, i) => {
-            const v = normalizeWeight(rawVal);
-            const isEmpty = v === 0;
-            const h = isEmpty ? 26 : 60 + v * 34;
-            const isHover = hover === i;
+      <div className="relative">
+        <div className="grid grid-cols-7 gap-y-4 gap-x-2 md:gap-y-6 md:gap-x-4 mb-2">
+          {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+            <div key={day} className="text-center font-mono text-[10px] uppercase tracking-widest text-[var(--color-ink-soft)]">
+              {day}
+            </div>
+          ))}
+          {grid.map((day, i) => {
+            if (day === null) {
+              return <div key={`empty-${i}`} className="w-8 h-8 md:w-10 md:h-10 mx-auto" />;
+            }
+
+            const dateKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+            const count = entriesByDate[dateKey] || 0;
+            const style = getDotStyle(count);
+            
+            // Is it today?
+            const isToday = isCurrentMonth && day === new Date().getDate();
+
             return (
-              <button
-                key={i}
-                type="button"
-                onMouseEnter={() => setHover(i)}
-                onMouseLeave={() => setHover((h) => (h === i ? null : h))}
-                onFocus={() => setHover(i)}
-                onBlur={() => setHover((h) => (h === i ? null : h))}
-                aria-label={`Day ${i + 1}`}
-                className="group relative flex-1 origin-bottom cursor-default transition-transform duration-300 ease-out"
-                style={{
-                  height: `${h}px`,
-                  transform: isHover ? "translateY(-6px)" : "translateY(0)",
+              <div 
+                key={`day-${day}`} 
+                className="relative flex justify-center items-center h-10 w-full"
+                onMouseEnter={(e) => {
+                  const rect = e.currentTarget.getBoundingClientRect();
+                  setHoveredDay({ date: dateKey, count, x: rect.left + rect.width / 2, y: rect.top });
                 }}
+                onMouseLeave={() => setHoveredDay(null)}
               >
-                <span
-                  aria-hidden
-                  className="block h-full w-full"
-                  style={{
-                    background: isEmpty
-                      ? "repeating-linear-gradient(180deg, oklch(0.93 0.014 82) 0 4px, oklch(0.9 0.018 82) 4px 5px)"
-                      : volumeColor(v),
-                    boxShadow: isEmpty
-                      ? "inset 0 0 0 1px var(--color-rule)"
-                      : "inset 0 0 0 1px oklch(0.2 0.02 80 / 0.25), inset 1px 0 0 oklch(1 0 0 / 0.35), 0 6px 10px -8px oklch(0.2 0.02 80 / 0.5)",
-                    borderTopLeftRadius: 1,
-                    borderTopRightRadius: 1,
-                  }}
+                <button
+                  className={`w-6 h-6 md:w-8 md:h-8 rounded-full transition-transform hover:scale-110 ${isToday ? 'ring-2 ring-[var(--color-ink)] ring-offset-2 ring-offset-[var(--color-paper)]' : ''}`}
+                  style={style}
+                  aria-label={`${dateKey}: ${count} logs`}
                 />
-                {!isEmpty && (
-                  <>
-                    <span
-                      aria-hidden
-                      className="pointer-events-none absolute left-0 right-0 h-[3px]"
-                      style={{ top: "22%", background: "oklch(0.2 0.02 80 / 0.35)" }}
-                    />
-                    <span
-                      aria-hidden
-                      className="pointer-events-none absolute left-0 right-0 h-[3px]"
-                      style={{ bottom: "22%", background: "oklch(0.2 0.02 80 / 0.35)" }}
-                    />
-                  </>
-                )}
-              </button>
+              </div>
             );
           })}
         </div>
-
-        <div className="pointer-events-none absolute left-0 top-0 h-full w-full" aria-hidden>
-          {hover !== null && (
-            <div
-              className="absolute -top-2 max-w-[220px] paper-sheet px-4 py-3"
-              style={{
-                left: `calc(${(hover / total) * 100}% - 90px)`,
-                transform: "translateY(-100%)",
-              }}
-            >
-              <Label>Volume</Label>
-              <div className="mt-1 font-serif text-[15px] leading-tight">
-                {heatmap[hover] === 0 ? "Empty Day" : `${heatmap[hover]} Fragment(s)`}
-              </div>
-              <div className="mt-1 font-mono text-[10px] tracking-[0.16em] text-[var(--color-ink-soft)]">
-                {total - 1 - hover} days ago
-              </div>
-            </div>
-          )}
-        </div>
       </div>
 
-      <div className="mt-8 flex items-center justify-between">
-        <Ref>earliest ⟶ today</Ref>
-        <div className="flex items-center gap-3">
-          <Label>Weight</Label>
-          <div className="flex items-end gap-[2px]">
-            {[1, 2, 3].map((n) => (
-              <span
-                key={n}
-                className="block w-2"
-                style={{ height: `${8 + n * 4}px`, background: volumeColor(n) }}
-              />
-            ))}
+      {/* Tooltip Overlay */}
+      {hoveredDay && (
+        <div 
+          className="fixed z-50 pointer-events-none transform -translate-x-1/2 -translate-y-full pb-2"
+          style={{ left: hoveredDay.x, top: hoveredDay.y }}
+        >
+          <div className="bg-[var(--color-ink)] text-[var(--color-paper)] px-3 py-1.5 rounded-[4px] shadow-lg text-[11px] font-mono whitespace-nowrap flex flex-col items-center">
+            <span className="opacity-80 mb-0.5">{new Date(hoveredDay.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+            <span className="font-bold">{hoveredDay.count} log{hoveredDay.count !== 1 ? 's' : ''}</span>
+            <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-[var(--color-ink)] rotate-45" />
           </div>
         </div>
-      </div>
+      )}
     </section>
   );
-}
-
-function volumeColor(weight: number) {
-  if (weight >= 3) return "oklch(0.36 0.09 25)"; 
-  if (weight === 2) return "oklch(0.48 0.06 45)"; 
-  return "oklch(0.58 0.04 70)"; 
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -783,7 +753,7 @@ export default function EditWorkspaceRedesign({ goal }: { goal: GoalData }) {
 
         {/* Full width — Shelf Index (progress) */}
         <div className="col-span-12 mt-4">
-          <ShelfIndex goal={goal} />
+          <CalendarHeatmap goal={goal} />
         </div>
 
         {/* Full width — Recent fragments */}

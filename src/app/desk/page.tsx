@@ -1,8 +1,9 @@
 import React from 'react';
 import { getRecentGoals } from '@/app/actions';
-import Link from 'next/link';
+import { ArchivalLink as Link } from '@/components/transitions/ArchivalLink';
 import { Label, RefId, SectionHeading, FoldRule } from '@/components/AtelierPrimitives';
 import { format } from 'date-fns';
+import { InkRegion } from '@/components/transitions/InkPrimitives';
 
 export default async function DeskPage() {
   const activeFolios = await getRecentGoals(10);
@@ -12,7 +13,8 @@ export default async function DeskPage() {
       <div className="mx-auto max-w-[1360px] px-6 lg:px-12 pt-16">
         
         {/* Desk Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16">
+        <InkRegion priority={1}>
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16">
           <div className="max-w-[34ch]">
             <SectionHeading index="§ I" title="The Desk" hint="active work" />
             <p className="mt-8 font-serif text-[1.1rem] leading-[1.6] text-[color:var(--color-ink-soft)] italic">
@@ -28,13 +30,17 @@ export default async function DeskPage() {
               <span className="opacity-50">Capacity</span>
               <span className="text-xl">10 max</span>
             </div>
+            </div>
           </div>
-        </div>
+        </InkRegion>
 
-        <FoldRule className="mb-16" />
+        <InkRegion priority={3}>
+          <FoldRule className="mb-16" />
+        </InkRegion>
 
         {/* Desk Grid */}
-        {activeFolios.length === 0 ? (
+        <InkRegion priority={2}>
+          {activeFolios.length === 0 ? (
           <div className="py-32 text-center">
             <h2 className="font-serif text-[2rem] italic text-[color:var(--color-ink-soft)]">
               The desk is completely clear.
@@ -109,6 +115,7 @@ export default async function DeskPage() {
             })}
           </div>
         )}
+        </InkRegion>
       </div>
     </main>
   );

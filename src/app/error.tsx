@@ -14,6 +14,9 @@ export default function ErrorBoundary({
 }) {
   useEffect(() => {
     console.error('Unhandled exception:', error);
+    // Write error to local API or just alert it if we were in a browser, but here we can just log it
+    // Wait, since we are in the browser, we can't write to fs directly.
+    fetch('/api/log-error?msg=' + encodeURIComponent(error.message + '\\n' + error.stack));
   }, [error]);
 
   return (

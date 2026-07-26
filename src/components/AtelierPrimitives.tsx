@@ -1,29 +1,30 @@
 import React from 'react';
 import { ArchiveManifest } from './ArchiveManifest';
 import { getArchiveStats } from '@/app/actions';
+import { InkText, InkBlock, InkRule } from './transitions/InkPrimitives';
 
 export function RefId({ children, className = '' }: { children: React.ReactNode, className?: string }) {
-  return <span className={`ref-id ${className}`}>{children}</span>;
+  return <InkText className={`ref-id ${className}`}>{children}</InkText>;
 }
 
 export function Label({ children, className = '' }: { children: React.ReactNode, className?: string }) {
-  return <span className={`label-caps ${className}`}>{children}</span>;
+  return <InkText className={`label-caps ${className}`}>{children}</InkText>;
 }
 
 export function Stamp({ children, className = '' }: { children: React.ReactNode, className?: string }) {
-  return <span className={`archive-stamp ${className}`}>{children}</span>;
+  return <InkText className={`archive-stamp ${className}`}>{children}</InkText>;
 }
 
 export function MarginNote({ children }: { children: React.ReactNode }) {
   return (
-    <p className="font-serif italic text-[0.82rem] leading-snug text-[color:var(--color-ink-soft)]">
+    <InkText className="block font-serif italic text-[0.82rem] leading-snug text-[color:var(--color-ink-soft)]">
       {children}
-    </p>
+    </InkText>
   );
 }
 
 export function FoldRule({ className = "" }: { className?: string }) {
-  return <div className={`h-px w-full bg-[var(--color-rule)] ${className}`} aria-hidden />;
+  return <InkRule className={className} />;
 }
 
 export function SectionHeading({
@@ -39,7 +40,7 @@ export function SectionHeading({
     <div className="flex items-baseline justify-between gap-6">
       <div className="flex items-baseline gap-4">
         <RefId>{index}</RefId>
-        <h3 className="font-serif text-xl leading-none tracking-tight">{title}</h3>
+        <InkText className="block font-serif text-xl leading-none tracking-tight">{title}</InkText>
       </div>
       {hint && <Label className="hidden sm:inline">{hint}</Label>}
     </div>
@@ -58,9 +59,9 @@ export function ReferenceSnippet({
   return (
     <figure className="group relative pt-2">
       <RefId>{id}</RefId>
-      <blockquote className="mt-4 font-serif italic text-[1.02rem] leading-[1.6] text-[color:var(--color-ink)]">
+      <InkText className="block mt-4 font-serif italic text-[1.02rem] leading-[1.6] text-[color:var(--color-ink)]">
         “{note}”
-      </blockquote>
+      </InkText>
       <figcaption className="mt-5 flex items-center justify-between border-t border-[color:var(--color-rule)] pt-3">
         <span className="label-caps">{source}</span>
         <span className="ref-id opacity-60 transition-opacity duration-200 group-hover:opacity-100">cf. R-039</span>
@@ -77,9 +78,9 @@ export async function ComponentAtlas() {
       <div className="flex items-end justify-between mb-8">
         <div>
           <Label>Fig. 05 · The Archival Record</Label>
-          <h2 className="mt-5 font-serif text-[2.4rem] leading-[1.1] tracking-tight">
+          <InkText className="block mt-5 font-serif text-[2.4rem] leading-[1.1] tracking-tight">
             An accumulation of <span className="italic">quiet work</span>.
-          </h2>
+          </InkText>
         </div>
         <RefId>manifest · 2026</RefId>
       </div>

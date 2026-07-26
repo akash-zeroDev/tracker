@@ -2,6 +2,7 @@ import React from 'react';
 import { EntriesManuscript } from '@/components/EntriesManuscript';
 import { getAllEntries } from '@/app/actions';
 import { format } from 'date-fns';
+import { InkRegion } from '@/components/transitions/InkPrimitives';
 
 // Helper to calculate raw calendar day differences
 function getCalendarDayDifference(previousDate: Date | null, currentDate: Date): number {
@@ -141,11 +142,13 @@ export default async function EntriesPage() {
 
   return (
     <main className="min-h-screen text-[color:var(--color-ink)] pb-32">
-      <EntriesManuscript 
-        entries={finalRows} 
-        summaries={monthlyStats} 
-        archiveStats={archiveStats}
-      />
+      <InkRegion priority={2}>
+        <EntriesManuscript 
+          entries={finalRows} 
+          summaries={monthlyStats} 
+          archiveStats={archiveStats}
+        />
+      </InkRegion>
     </main>
   );
 }

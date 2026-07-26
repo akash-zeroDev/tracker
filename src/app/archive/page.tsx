@@ -1,5 +1,8 @@
 import { ArchiveClient, ArchiveVolumeData, VolumeSize } from '@/components/ArchiveClient';
 import { getArchivedGoals, getArchiveStats } from '@/app/actions';
+import { ArchivalLink as Link } from '@/components/transitions/ArchivalLink';
+import { Label, RefId, SectionHeading, FoldRule } from '@/components/AtelierPrimitives';
+import { InkRegion } from '@/components/transitions/InkPrimitives';
 
 function calculateSize(longestStreak: number, totalEntries: number): VolumeSize {
   if (longestStreak > 20 || totalEntries > 40) return 'featured';
