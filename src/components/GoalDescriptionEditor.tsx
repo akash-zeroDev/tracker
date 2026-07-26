@@ -1,15 +1,12 @@
 'use client';
-
 import React, { useState, useRef, useEffect } from 'react';
 import { updateGoalDescription } from '@/app/actions';
 import { useRouter } from 'next/navigation';
 import { Edit2, Loader2, Check } from 'lucide-react';
-
 interface GoalDescriptionEditorProps {
   goalId: string;
   initialDescription: string | null;
 }
-
 export function GoalDescriptionEditor({ goalId, initialDescription }: GoalDescriptionEditorProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [description, setDescription] = useState(initialDescription || '');
@@ -17,18 +14,14 @@ export function GoalDescriptionEditor({ goalId, initialDescription }: GoalDescri
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const router = useRouter();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-
   const defaultText = "The Streak is bound like a signature in a book — one thread per day, stitched through the spine. Missed days are visible; the book still holds.";
-
   const displayDescription = initialDescription || defaultText;
-
   useEffect(() => {
     if (isEditing && textareaRef.current) {
       textareaRef.current.focus();
       textareaRef.current.setSelectionRange(textareaRef.current.value.length, textareaRef.current.value.length);
     }
   }, [isEditing]);
-
   const handleSave = async () => {
     setIsSaving(true);
     setErrorMsg(null);
@@ -43,7 +36,6 @@ export function GoalDescriptionEditor({ goalId, initialDescription }: GoalDescri
       setIsSaving(false);
     }
   };
-
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
       handleSave();
@@ -54,7 +46,6 @@ export function GoalDescriptionEditor({ goalId, initialDescription }: GoalDescri
       setIsEditing(false);
     }
   };
-
   if (isEditing) {
     return (
       <div className="mt-6 max-w-[38ch] flex flex-col gap-2">
@@ -96,7 +87,6 @@ export function GoalDescriptionEditor({ goalId, initialDescription }: GoalDescri
       </div>
     );
   }
-
   return (
     <div 
       className="group relative mt-6 max-w-[38ch] cursor-pointer rounded-md p-1 -ml-1 transition-colors hover:bg-[color:var(--color-rule)]/30"

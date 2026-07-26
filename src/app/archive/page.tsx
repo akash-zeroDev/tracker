@@ -3,38 +3,29 @@ import { getArchivedGoals, getArchiveStats } from '@/app/actions';
 import { ArchivalLink as Link } from '@/components/transitions/ArchivalLink';
 import { Label, RefId, SectionHeading, FoldRule } from '@/components/AtelierPrimitives';
 import { InkRegion } from '@/components/transitions/InkPrimitives';
-
 function calculateSize(longestStreak: number, totalEntries: number): VolumeSize {
   if (longestStreak > 20 || totalEntries > 40) return 'featured';
   if (longestStreak < 10 && totalEntries < 15) return 'compact';
   return 'standard';
 }
-
 function generateShelfCode(category: string, index: number) {
   const prefix = category.substring(0, 2).toUpperCase();
   const num = (index + 1).toString().padStart(2, '0');
   return `${prefix}-${num}`;
 }
-
 function getRomanVol(num: number) {
   const numerals = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII', 'XIII', 'XIV', 'XV'];
   return numerals[num % numerals.length] || num.toString();
 }
-
 export default async function ArchivePage() {
   const [archivedGoals, stats] = await Promise.all([
     getArchivedGoals(),
     getArchiveStats()
   ]);
-
-  // Transform database models into our rich archival UI data
   const volumes: ArchiveVolumeData[] = archivedGoals.map((g, i) => {
-    
-    // Calculate a rough duration (e.g. days between created and last entry if available)
     const firstEntry = g.entries[g.entries.length - 1];
     const lastEntry = g.entries[0];
     let duration = "Unknown";
-    
     if (firstEntry && lastEntry) {
       const ms = new Date(lastEntry.createdAt).getTime() - new Date(firstEntry.createdAt).getTime();
       const days = Math.max(1, Math.round(ms / (1000 * 60 * 60 * 24)));
@@ -42,7 +33,6 @@ export default async function ArchivePage() {
     } else {
       duration = `${g.longestStreak || 1} Days`;
     }
-
     return {
       id: g.id,
       volNumber: getRomanVol(i),
@@ -59,14 +49,11 @@ export default async function ArchivePage() {
       timestamp: new Date(g.createdAt).getTime()
     };
   });
-
-  // Calculate distinct years archived
   const years = new Set(archivedGoals.map(g => new Date(g.createdAt).getFullYear()));
   const extendedStats = {
     ...stats,
     yearsCount: years.size,
     archivedCount: archivedGoals.length
   };
-
   return <ArchiveClient volumes={volumes} stats={extendedStats} />;
 }

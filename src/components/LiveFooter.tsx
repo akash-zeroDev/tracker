@@ -1,21 +1,18 @@
 'use client';
-
 import React, { useRef } from 'react';
 import { ArchivalLink as Link } from '@/components/transitions/ArchivalLink';
 import { motion, useInView, Variants } from 'framer-motion';
 import { Label, Stamp, RefId } from '@/components/AtelierPrimitives';
 import { InkRegion } from '@/components/transitions/InkPrimitives';
-
+import { GITHUB_REPO_URL } from '@/lib/constants';
 export function LiveFooter() {
   const footerRef = useRef(null);
   const inView = useInView(footerRef, { once: true, margin: "-50px" });
-  
   const currentYear = new Date().getFullYear();
-  // Simple roman numeral converter for the year
   const romanYear = (num: number) => {
     const lookup: any = {M:1000,CM:900,D:500,CD:400,C:100,XC:90,L:50,XL:40,X:10,IX:9,V:5,IV:4,I:1};
     let roman = '';
-    for (let i in lookup) {
+    for (const i in lookup) {
       while (num >= lookup[i]) {
         roman += i;
         num -= lookup[i];
@@ -23,7 +20,6 @@ export function LiveFooter() {
     }
     return roman;
   };
-
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: { 
@@ -31,12 +27,10 @@ export function LiveFooter() {
       transition: { staggerChildren: 0.1, delayChildren: 0.2 }
     }
   };
-
   const itemVariants: any = {
     hidden: { opacity: 0, y: 10 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] } }
   };
-
   return (
     <InkRegion priority={4} className="mt-auto">
       <footer ref={footerRef} className="border-t border-[color:var(--color-rule)] bg-[color:var(--color-paper-deep)]/60 overflow-hidden">
@@ -58,7 +52,6 @@ export function LiveFooter() {
               warm paper stock. Bound by hand, one day at a time.
             </motion.p>
           </div>
-          
           <div className="col-span-6 md:col-span-3">
             <motion.div variants={itemVariants}><Label>Sections</Label></motion.div>
             <ul className="mt-4 space-y-3 font-serif text-[0.95rem]">
@@ -77,34 +70,35 @@ export function LiveFooter() {
               </motion.li>
             </ul>
           </div>
-
           <div className="col-span-6 md:col-span-2">
             <motion.div variants={itemVariants}><Label>Marginalia</Label></motion.div>
             <ul className="mt-4 space-y-3 font-serif text-[0.95rem]">
               <motion.li variants={itemVariants}>
-                <a href="https://github.com/teamSiksha" target="_blank" rel="noreferrer" className="footnote-link inline-block hover:text-[color:var(--color-burgundy)] transition-colors duration-300">
+                <a href={GITHUB_REPO_URL} target="_blank" rel="noopener noreferrer" className="footnote-link inline-block hover:text-[color:var(--color-burgundy)] transition-colors duration-300">
                   Source Code
                 </a>
               </motion.li>
               <motion.li variants={itemVariants}>
-                <a href="#" className="footnote-link inline-block hover:text-[color:var(--color-burgundy)] transition-colors duration-300">
-                  Release Notes
-                </a>
+                <Link href="/manifesto" className="footnote-link inline-block hover:text-[color:var(--color-burgundy)] transition-colors duration-300">
+                  Manifesto
+                </Link>
+              </motion.li>
+              <motion.li variants={itemVariants}>
+                <Link href="/editions" className="footnote-link inline-block hover:text-[color:var(--color-burgundy)] transition-colors duration-300">
+                  Upcoming Editions
+                </Link>
               </motion.li>
             </ul>
           </div>
-
           <div className="col-span-12 md:col-span-2 flex flex-col justify-between items-start md:items-end mt-8 md:mt-0">
             <motion.div variants={itemVariants} whileHover={{ rotate: 2, scale: 1.05 }} transition={{ type: "spring", stiffness: 300, damping: 10 }}>
               <Stamp>Vol. IV · {romanYear(currentYear)}</Stamp>
             </motion.div>
-            
             <motion.div variants={itemVariants} className="mt-8 md:mt-0 opacity-80 hover:opacity-100 transition-opacity">
               <RefId>SYNC · {currentYear}</RefId>
             </motion.div>
           </div>
         </motion.div>
-
         <div className="border-t border-dashed border-[color:var(--color-rule)]">
           <motion.div 
             initial={{ opacity: 0 }}

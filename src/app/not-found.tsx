@@ -3,7 +3,6 @@ import Link from 'next/link';
 import { AppContainer, Section, Stack } from '@/components/ui/layout';
 import { Heading, Body } from '@/components/ui/typography';
 import { Button } from '@/components/ui/Button';
-
 export default function NotFound() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-[var(--color-background)]">
@@ -17,7 +16,6 @@ export default function NotFound() {
               This link is malformed or the Tracker has been permanently destroyed.
             </Body>
           </Stack>
-          
           <Link href="/">
             <Button variant="secondary" className="tracking-widest font-bold">
               RETURN TO ORIGIN

@@ -1,23 +1,16 @@
 'use client';
-
 import React, { createContext, useContext } from 'react';
 import { motion, HTMLMotionProps } from 'framer-motion';
-
-// Priorities: 0 (Navigation) to 4 (Metadata/Footers)
 export type InkPriority = 0 | 1 | 2 | 3 | 4;
-
 const InkRegionContext = createContext<InkPriority>(2);
-
 export function useInkRegionPriority() {
   return useContext(InkRegionContext);
 }
-
 interface InkRegionProps {
   children: React.ReactNode;
   priority?: InkPriority;
-  className?: string; // Optional class for layout grouping if necessary
+  className?: string; 
 }
-
 export function InkRegion({ children, priority = 2, className = '' }: InkRegionProps) {
   if (className) {
     return (
@@ -26,17 +19,14 @@ export function InkRegion({ children, priority = 2, className = '' }: InkRegionP
       </InkRegionContext.Provider>
     );
   }
-  
   return (
     <InkRegionContext.Provider value={priority}>
       {children}
     </InkRegionContext.Provider>
   );
 }
-
 const INCOMING_DELAYS = [0, 0.04, 0.08, 0.12, 0.16];
 const OUTGOING_DELAYS = [0.16, 0.12, 0.08, 0.04, 0];
-
 // The core ink variants that all primitives inherit
 const inkVariants = {
   initial: {
@@ -70,11 +60,6 @@ const inkVariants = {
     },
   }),
 };
-
-// ---------------------------------------------------------
-// INK PRIMITIVES
-// ---------------------------------------------------------
-
 export function InkText({ className, children, ...props }: HTMLMotionProps<"span">) {
   const priority = useInkRegionPriority();
   return (
@@ -88,7 +73,6 @@ export function InkText({ className, children, ...props }: HTMLMotionProps<"span
     </motion.span>
   );
 }
-
 export function InkBlock({ className, children, ...props }: HTMLMotionProps<"div">) {
   const priority = useInkRegionPriority();
   return (
@@ -102,7 +86,6 @@ export function InkBlock({ className, children, ...props }: HTMLMotionProps<"div
     </motion.div>
   );
 }
-
 export function InkRule({ className, ...props }: HTMLMotionProps<"div">) {
   const priority = useInkRegionPriority();
   return (

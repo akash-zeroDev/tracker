@@ -1,24 +1,19 @@
 'use client';
-
 import React from 'react';
 import { cn } from '@/utils/cn';
 import { ArrowRight } from 'lucide-react';
 import { Button } from './Button';
-
 export interface OmniInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   onSubmitAction?: (value: string) => void;
 }
-
 export function OmniInput({ className, onSubmitAction, ...props }: OmniInputProps) {
   const [value, setValue] = React.useState('');
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (value.trim() && onSubmitAction) {
       onSubmitAction(value);
     }
   };
-
   return (
     <form
       onSubmit={handleSubmit}

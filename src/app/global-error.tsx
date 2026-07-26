@@ -1,10 +1,8 @@
 'use client';
-
 import React, { useEffect } from 'react';
 import { AppContainer, Section, Stack } from '@/components/ui/layout';
 import { Heading, Body } from '@/components/ui/typography';
 import { Button } from '@/components/ui/Button';
-
 export default function GlobalError({
   error,
   reset,
@@ -13,10 +11,8 @@ export default function GlobalError({
   reset: () => void;
 }) {
   useEffect(() => {
-    // Log the error to an error reporting service in production
     console.error('Global unhandled exception:', error);
   }, [error]);
-
   return (
     <html lang="en">
       <body className="relative min-h-screen bg-[var(--color-background)] text-[var(--color-foreground)] antialiased">
@@ -31,7 +27,6 @@ export default function GlobalError({
                   An unexpected anomaly interrupted the sequence. No coordinates were corrupted.
                 </Body>
               </Stack>
-              
               <Button variant="secondary" onClick={() => reset()} className="tracking-widest font-bold">
                 REINITIALIZE
               </Button>

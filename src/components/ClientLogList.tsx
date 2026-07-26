@@ -1,10 +1,8 @@
 'use client';
-
 import React, { useState } from 'react';
 import { format } from 'date-fns';
 import { Label, RefId } from '@/components/AtelierPrimitives';
 import { EditorialTime } from '@/components/ui/EditorialTime';
-
 interface ClientLogListProps {
   entries: {
     id: string;
@@ -12,14 +10,11 @@ interface ClientLogListProps {
     content: string | null;
   }[];
 }
-
 export function ClientLogList({ entries }: ClientLogListProps) {
   const [expanded, setExpanded] = useState(false);
   const LIMIT = 3;
-
   const displayedEntries = expanded ? entries : entries.slice(0, LIMIT);
   const hasMore = entries.length > LIMIT;
-
   if (entries.length === 0) {
     return (
       <p className="font-serif italic text-lg text-[color:var(--color-ink-soft)] mt-16">
@@ -27,7 +22,6 @@ export function ClientLogList({ entries }: ClientLogListProps) {
       </p>
     );
   }
-
   return (
     <div className="mt-16">
       <div className={`relative ${expanded ? 'max-h-[600px] overflow-y-auto pr-2 custom-scrollbar border-b border-[color:var(--color-rule)]' : ''}`}>
@@ -68,7 +62,6 @@ export function ClientLogList({ entries }: ClientLogListProps) {
           ))}
         </ol>
       </div>
-      
       {!expanded && hasMore && (
         <div className="mt-8 border-t border-[color:var(--color-rule)] pt-8 text-center">
           <button 

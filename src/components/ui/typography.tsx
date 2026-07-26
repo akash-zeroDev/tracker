@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { cn } from '@/lib/utils';
-
 export const Heading = React.forwardRef<HTMLHeadingElement, React.HTMLAttributes<HTMLHeadingElement> & { level?: 1 | 2 | 3 | 4 | 5 | 6 }>(
   ({ className, level = 1, ...props }, ref) => {
     const Component = `h${level}` as const;
@@ -12,7 +11,6 @@ export const Heading = React.forwardRef<HTMLHeadingElement, React.HTMLAttributes
       5: 'text-lg font-medium tracking-tight',
       6: 'text-base font-medium tracking-tight',
     };
-
     return (
       <Component
         ref={ref}
@@ -23,7 +21,6 @@ export const Heading = React.forwardRef<HTMLHeadingElement, React.HTMLAttributes
   }
 );
 Heading.displayName = 'Heading';
-
 export const SubHeading = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLParagraphElement>>(
   ({ className, ...props }, ref) => (
     <p
@@ -34,7 +31,6 @@ export const SubHeading = React.forwardRef<HTMLParagraphElement, React.HTMLAttri
   )
 );
 SubHeading.displayName = 'SubHeading';
-
 export const Title = React.forwardRef<HTMLHeadingElement, React.HTMLAttributes<HTMLHeadingElement>>(
   ({ className, ...props }, ref) => (
     <h2
@@ -45,7 +41,6 @@ export const Title = React.forwardRef<HTMLHeadingElement, React.HTMLAttributes<H
   )
 );
 Title.displayName = 'Title';
-
 export const Body = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLParagraphElement>>(
   ({ className, ...props }, ref) => (
     <p
@@ -56,7 +51,6 @@ export const Body = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<
   )
 );
 Body.displayName = 'Body';
-
 export const Caption = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLParagraphElement>>(
   ({ className, ...props }, ref) => (
     <p
@@ -67,7 +61,6 @@ export const Caption = React.forwardRef<HTMLParagraphElement, React.HTMLAttribut
   )
 );
 Caption.displayName = 'Caption';
-
 export const Mono = React.forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>(
   ({ className, ...props }, ref) => (
     <span
@@ -78,7 +71,6 @@ export const Mono = React.forwardRef<HTMLElement, React.HTMLAttributes<HTMLEleme
   )
 );
 Mono.displayName = 'Mono';
-
 export const Label = React.forwardRef<HTMLLabelElement, React.LabelHTMLAttributes<HTMLLabelElement>>(
   ({ className, ...props }, ref) => (
     <label
@@ -89,7 +81,6 @@ export const Label = React.forwardRef<HTMLLabelElement, React.LabelHTMLAttribute
   )
 );
 Label.displayName = 'Label';
-
 export const HelperText = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLParagraphElement>>(
   ({ className, ...props }, ref) => (
     <p
@@ -100,7 +91,6 @@ export const HelperText = React.forwardRef<HTMLParagraphElement, React.HTMLAttri
   )
 );
 HelperText.displayName = 'HelperText';
-
 export const ErrorText = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLParagraphElement>>(
   ({ className, ...props }, ref) => (
     <p

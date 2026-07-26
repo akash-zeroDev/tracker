@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { cn } from '@/lib/utils';
-
 export const AppContainer = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
     <div
@@ -11,7 +10,6 @@ export const AppContainer = React.forwardRef<HTMLDivElement, React.HTMLAttribute
   )
 );
 AppContainer.displayName = 'AppContainer';
-
 export const ContentWidth = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
     <div
@@ -22,7 +20,6 @@ export const ContentWidth = React.forwardRef<HTMLDivElement, React.HTMLAttribute
   )
 );
 ContentWidth.displayName = 'ContentWidth';
-
 export const Section = React.forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>(
   ({ className, ...props }, ref) => (
     <section
@@ -33,7 +30,6 @@ export const Section = React.forwardRef<HTMLElement, React.HTMLAttributes<HTMLEl
   )
 );
 Section.displayName = 'Section';
-
 export const Stack = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
     <div
@@ -44,7 +40,6 @@ export const Stack = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLD
   )
 );
 Stack.displayName = 'Stack';
-
 export const Inline = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
     <div
@@ -55,7 +50,6 @@ export const Inline = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTML
   )
 );
 Inline.displayName = 'Inline';
-
 export const Cluster = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
     <div
@@ -66,7 +60,6 @@ export const Cluster = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTM
   )
 );
 Cluster.displayName = 'Cluster';
-
 export const Divider = React.forwardRef<HTMLHRElement, React.HTMLAttributes<HTMLHRElement>>(
   ({ className, ...props }, ref) => (
     <hr
@@ -77,7 +70,6 @@ export const Divider = React.forwardRef<HTMLHRElement, React.HTMLAttributes<HTML
   )
 );
 Divider.displayName = 'Divider';
-
 export const Spacer = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement> & { size?: 'sm' | 'md' | 'lg' | 'xl' }>(
   ({ className, size = 'md', ...props }, ref) => {
     const sizeClasses = {
@@ -96,7 +88,6 @@ export const Spacer = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTML
   }
 );
 Spacer.displayName = 'Spacer';
-
 export const EmptyStateContainer = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
     <div
@@ -107,7 +98,6 @@ export const EmptyStateContainer = React.forwardRef<HTMLDivElement, React.HTMLAt
   )
 );
 EmptyStateContainer.displayName = 'EmptyStateContainer';
-
 export const LoadingContainer = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
     <div
@@ -118,7 +108,6 @@ export const LoadingContainer = React.forwardRef<HTMLDivElement, React.HTMLAttri
   )
 );
 LoadingContainer.displayName = 'LoadingContainer';
-
 export const ErrorContainer = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
     <div

@@ -1,5 +1,4 @@
 'use client';
-
 import React, { useState, useEffect, useRef, useTransition } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArchiveVolumeData } from './ArchiveClient';
@@ -7,20 +6,17 @@ import { EditorialTime } from '@/components/ui/EditorialTime';
 import { deleteGoal } from '@/app/actions';
 import { useRouter } from 'next/navigation';
 import { Trash2 } from 'lucide-react';
-
 interface FolioWithdrawalNoticeProps {
   folio: ArchiveVolumeData;
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
 }
-
 export function FolioWithdrawalNotice({ folio, isOpen, onClose, onSuccess }: FolioWithdrawalNoticeProps) {
   const [inputValue, setInputValue] = useState('');
   const [isPending, startTransition] = useTransition();
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
-
   // Reset input when modal opens
   useEffect(() => {
     if (isOpen) {
@@ -32,7 +28,6 @@ export function FolioWithdrawalNotice({ folio, isOpen, onClose, onSuccess }: Fol
       return () => clearTimeout(t);
     }
   }, [isOpen]);
-
   // Handle Escape key
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -43,10 +38,7 @@ export function FolioWithdrawalNotice({ folio, isOpen, onClose, onSuccess }: Fol
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, onClose, isPending]);
-
-  // Case-sensitive exact match for intentional friction
   const isValid = inputValue.trim() === folio.title.trim();
-
   const handleDiscard = () => {
     if (!isValid) return;
     startTransition(async () => {
@@ -60,12 +52,11 @@ export function FolioWithdrawalNotice({ folio, isOpen, onClose, onSuccess }: Fol
       }
     });
   };
-
   return (
     <AnimatePresence>
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
-          {/* Backdrop */}
+          {}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -74,8 +65,7 @@ export function FolioWithdrawalNotice({ folio, isOpen, onClose, onSuccess }: Fol
             className="absolute inset-0 bg-[color:var(--color-paper-deep)]/80 backdrop-blur-sm"
             onClick={() => !isPending && onClose()}
           />
-
-          {/* Modal Container */}
+          {}
           <motion.div
             role="dialog"
             aria-modal="true"
@@ -86,7 +76,7 @@ export function FolioWithdrawalNotice({ folio, isOpen, onClose, onSuccess }: Fol
             transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
             className="relative w-full max-w-lg bg-[color:var(--color-paper)] border border-[color:var(--color-rule)] p-8 sm:p-10 shadow-2xl"
           >
-            {/* Header */}
+            {}
             <div className="flex flex-col gap-2 mb-8">
               <span className="font-mono text-[0.65rem] tracking-widest uppercase opacity-60">
                 Official Notice of Deaccession
@@ -95,14 +85,12 @@ export function FolioWithdrawalNotice({ folio, isOpen, onClose, onSuccess }: Fol
                 Discard Folio
               </h2>
             </div>
-
-            {/* Warning Text */}
+            {}
             <p className="font-serif text-[1.1rem] leading-[1.6] text-[color:var(--color-ink)] mb-8">
               This folio will be permanently discarded and removed from your archive.
               All associated historical entries, metadata, and streaks will be irreversibly erased.
             </p>
-
-            {/* Archival Summary (reinforcing value) */}
+            {}
             <div className="bg-[color:var(--color-paper-deep)] border border-[color:var(--color-rule)] p-5 mb-8">
               <div className="font-mono text-[0.65rem] tracking-widest uppercase opacity-60 mb-4 border-b border-[color:var(--color-rule)] pb-2">
                 Folio Details
@@ -126,8 +114,7 @@ export function FolioWithdrawalNotice({ folio, isOpen, onClose, onSuccess }: Fol
                 </div>
               </dl>
             </div>
-
-            {/* Intentional Friction Input */}
+            {}
             <div className="mb-10">
               <label htmlFor="friction-input" className="block font-serif text-[1.05rem] text-[color:var(--color-ink)] mb-3">
                 To confirm this irreversible action, type the folio title below exactly as it appears (case-sensitive).
@@ -148,8 +135,7 @@ export function FolioWithdrawalNotice({ folio, isOpen, onClose, onSuccess }: Fol
                 }}
               />
             </div>
-
-            {/* Actions */}
+            {}
             <div className="flex justify-end gap-6 items-center">
               <button
                 onClick={onClose}
@@ -158,7 +144,6 @@ export function FolioWithdrawalNotice({ folio, isOpen, onClose, onSuccess }: Fol
               >
                 Return to Archive
               </button>
-              
               <button
                 onClick={handleDiscard}
                 disabled={!isValid || isPending}
@@ -180,7 +165,6 @@ export function FolioWithdrawalNotice({ folio, isOpen, onClose, onSuccess }: Fol
                 )}
               </button>
             </div>
-            
           </motion.div>
         </div>
       )}

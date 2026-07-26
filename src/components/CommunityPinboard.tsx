@@ -2,9 +2,7 @@ import * as React from "react";
 import { getCommunityFeed } from '@/app/actions';
 import Link from 'next/link';
 import { EditorialTime } from '@/components/ui/EditorialTime';
-
 type Kind = "index" | "slip" | "folded" | "tracing" | "bookmark";
-
 export type Fragment = {
   id: string;
   ref: string;
@@ -16,11 +14,10 @@ export type Fragment = {
   fragment: string;
   date: string | React.ReactNode;
   kind: Kind;
-  tilt: number; // degrees, |x| <= 1
+  tilt: number; 
   featured?: boolean;
   publicSlug?: string;
 };
-
 const MOCK_FRAGMENTS: Fragment[] = [
   {
     id: "1",
@@ -108,7 +105,6 @@ const MOCK_FRAGMENTS: Fragment[] = [
     tilt: 0.8,
   },
 ];
-
 function Pin({
   className = "",
   style,
@@ -124,7 +120,6 @@ function Pin({
     />
   );
 }
-
 function Clip({
   className = "",
   style,
@@ -140,7 +135,6 @@ function Clip({
     />
   );
 }
-
 function StreakGlyph({ n }: { n: number }) {
   return (
     <span
@@ -162,7 +156,6 @@ function StreakGlyph({ n }: { n: number }) {
     </span>
   );
 }
-
 function Meta({ f }: { f: Fragment }) {
   return (
     <div className="flex items-baseline justify-between gap-4 pt-4">
@@ -171,7 +164,6 @@ function Meta({ f }: { f: Fragment }) {
     </div>
   );
 }
-
 function Byline({ f }: { f: Fragment }) {
   return (
     <div className="flex items-baseline justify-between gap-4">
@@ -191,7 +183,6 @@ function Byline({ f }: { f: Fragment }) {
     </div>
   );
 }
-
 function OpenArchive({ f }: { f: Fragment }) {
   if (f.publicSlug) {
     return (
@@ -206,9 +197,6 @@ function OpenArchive({ f }: { f: Fragment }) {
     </a>
   );
 }
-
-/* ————— Individual note variants ————— */
-
 function IndexCardNote({ f, featured }: { f: Fragment; featured?: boolean }) {
   return (
     <article
@@ -268,7 +256,6 @@ function IndexCardNote({ f, featured }: { f: Fragment; featured?: boolean }) {
     </article>
   );
 }
-
 function PaperSlipNote({ f }: { f: Fragment }) {
   return (
     <article
@@ -316,7 +303,6 @@ function PaperSlipNote({ f }: { f: Fragment }) {
     </article>
   );
 }
-
 function FoldedNote({ f }: { f: Fragment }) {
   const fold = 22;
   return (
@@ -328,7 +314,7 @@ function FoldedNote({ f }: { f: Fragment }) {
         overflow: "hidden",
       }}
     >
-      {/* folded corner */}
+      {}
       <span
         aria-hidden
         style={{
@@ -363,7 +349,6 @@ function FoldedNote({ f }: { f: Fragment }) {
     </article>
   );
 }
-
 function TracingNote({ f }: { f: Fragment }) {
   return (
     <article
@@ -404,7 +389,6 @@ function TracingNote({ f }: { f: Fragment }) {
     </article>
   );
 }
-
 function BookmarkNote({ f }: { f: Fragment }) {
   return (
     <article
@@ -414,7 +398,7 @@ function BookmarkNote({ f }: { f: Fragment }) {
         transform: `rotate(${f.tilt}deg)`,
       }}
     >
-      {/* bookmark ribbon */}
+      {}
       <span
         aria-hidden
         style={{
@@ -450,7 +434,6 @@ function BookmarkNote({ f }: { f: Fragment }) {
     </article>
   );
 }
-
 function Note({ f, featured }: { f: Fragment; featured?: boolean }) {
   switch (f.kind) {
     case "index":
@@ -465,16 +448,9 @@ function Note({ f, featured }: { f: Fragment; featured?: boolean }) {
       return <BookmarkNote f={f} />;
   }
 }
-
-/* ————— Board ————— */
-
 export default async function CommunityPinboard() {
   const dbGoals = await getCommunityFeed(6);
-
-  // The first note MUST be an "index" card to fit the featured grid slot.
-  // The rest can be randomly shuffled so the board feels organic every time.
   const remainingKinds: Kind[] = ["slip", "folded", "tracing", "bookmark", "index"];
-  
   const shuffle = <T,>(array: T[]): T[] => {
     const arr = [...array];
     for (let i = arr.length - 1; i > 0; i--) {
@@ -483,10 +459,8 @@ export default async function CommunityPinboard() {
     }
     return arr;
   };
-
   const shuffledKinds = ["index", ...shuffle(remainingKinds)];
-  const randomTilt = () => (Math.random() * 2.5 - 1.25); // Between -1.25 and 1.25 degrees
-
+  const randomTilt = () => (Math.random() * 2.5 - 1.25); 
   const mapped: Fragment[] = dbGoals.map((goal, idx) => {
     const entry = goal.entries[0];
     return {
@@ -505,25 +479,20 @@ export default async function CommunityPinboard() {
       publicSlug: goal.publicSlug
     };
   });
-
-  // If there are fewer than 6 real goals, we pad the rest with the mock fragments
-  // and assign them the remaining shuffled kinds/tilts
   const mockPadding = MOCK_FRAGMENTS.slice(mapped.length, 6).map((mock, idx) => ({
     ...mock,
     kind: shuffledKinds[mapped.length + idx] as Kind,
     tilt: randomTilt(),
   }));
-
   const fragments = [...mapped, ...mockPadding];
   const [featured, ...rest] = fragments;
-
   return (
     <section
       aria-labelledby="community-pinboard-heading"
       style={{ padding: "6rem 1.5rem" }}
     >
       <div style={{ maxWidth: 1180, margin: "0 auto" }}>
-        {/* Section header */}
+        {}
         <header
           className="reveal"
           style={{
@@ -563,8 +532,7 @@ export default async function CommunityPinboard() {
           </div>
           <span className="archive-stamp">Board · wk 30</span>
         </header>
-
-        {/* Pinboard surface */}
+        {}
         <div
           className="relative"
           style={{
@@ -577,7 +545,7 @@ export default async function CommunityPinboard() {
               "inset 0 0 60px oklch(0.4 0.03 60 / 0.08), 0 20px 40px -30px oklch(0.2 0.02 80 / 0.35)",
           }}
         >
-          {/* corner pins on the board itself */}
+          {}
           <span
             aria-hidden
             className="pin-dot"
@@ -598,18 +566,16 @@ export default async function CommunityPinboard() {
             className="pin-dot"
             style={{ position: "absolute", bottom: 14, right: 14 }}
           />
-
-          {/* Composition grid: featured left, stack right, strip bottom */}
+          {}
           <div className="grid gap-8 lg:gap-10 lg:grid-cols-12">
-            {/* Featured (large index card) */}
+            {}
             <div
               className="reveal lg:col-span-7"
               style={{ animationDelay: "60ms" }}
             >
               <Note f={featured} featured />
             </div>
-
-            {/* Right column: two smaller notes stacked */}
+            {}
             <div className="lg:col-span-5 flex flex-col gap-8">
               <div className="reveal" style={{ animationDelay: "140ms" }}>
                 <Note f={rest[0]} />
@@ -621,8 +587,7 @@ export default async function CommunityPinboard() {
                 <Note f={rest[1]} />
               </div>
             </div>
-
-            {/* Bottom strip: three offset supporting fragments */}
+            {}
             <div className="lg:col-span-12 grid gap-8 md:grid-cols-3 mt-2">
               <div className="reveal" style={{ animationDelay: "300ms" }}>
                 <Note f={rest[2]} />
@@ -639,8 +604,7 @@ export default async function CommunityPinboard() {
             </div>
           </div>
         </div>
-
-        {/* Footer margin note */}
+        {}
         <div
           className="reveal"
           style={{

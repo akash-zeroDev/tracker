@@ -1,5 +1,4 @@
 'use client';
-
 import * as React from "react";
 import { Folder, Search, CheckCircle, Clock } from 'lucide-react';
 import { useRouter } from "next/navigation";
@@ -12,11 +11,6 @@ import { GoalDescriptionEditor } from "./GoalDescriptionEditor";
 import { Flame, Trash2 } from 'lucide-react';
 import { deleteLogEntry } from '@/app/actions';
 import { GoalCategoryEditor } from "./GoalCategoryEditor";
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Types
-// ─────────────────────────────────────────────────────────────────────────────
-
 export interface GoalData {
   id: string;
   publicSlug: string;
@@ -41,23 +35,15 @@ export interface GoalData {
     createdAt: Date;
   } | null;
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Small primitives
-// ─────────────────────────────────────────────────────────────────────────────
-
 function Label({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return <span className={`label-caps ${className}`}>{children}</span>;
 }
-
 function Ref({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return <span className={`ref-id ${className}`}>{children}</span>;
 }
-
 function FoldRule({ className = "" }: { className?: string }) {
   return <div className={`h-px w-full bg-[var(--color-rule)] ${className}`} aria-hidden />;
 }
-
 function SectionHeading({
   index,
   title,
@@ -77,16 +63,10 @@ function SectionHeading({
     </div>
   );
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Left column — Volume information
-// ─────────────────────────────────────────────────────────────────────────────
-
 function VolumePlate({ goal }: { goal: GoalData }) {
   const ageDays = Math.max(1, Math.floor((Date.now() - new Date(goal.createdAt).getTime()) / (1000 * 60 * 60 * 24)));
   const shelf = goal.id.slice(0, 2).toUpperCase();
   const accession = goal.id.split('-')[0].toUpperCase();
-
   return (
     <aside className="reveal paper-sheet relative flex flex-col p-8 lg:p-10">
       <div className="flex justify-between items-start mb-6">
@@ -96,27 +76,21 @@ function VolumePlate({ goal }: { goal: GoalData }) {
           <Ref>№ {accession}</Ref>
         </div>
       </div>
-
       <h1 className="font-serif text-4xl leading-[1.05] tracking-tight lg:text-5xl">
         {goal.title}
       </h1>
-
       <div className="mt-4 -ml-2">
         <GoalDescriptionEditor goalId={goal.id} initialDescription={goal.description} />
       </div>
-
       <div className="mt-4">
         <GoalCategoryEditor goalId={goal.id} initialCategory={goal.category} />
       </div>
-
       <FoldRule className="my-10" />
-
       <dl className="grid grid-cols-3 gap-6">
         <ArchivalStreakStat label="Streak" value={goal.currentStreak} trigger={goal.entries.length} suffix="days" />
         <Stat label="Opened" value={ageDays} suffix="days ago" />
         <Stat label="Filed" value={goal.entries.length} suffix="frags." />
       </dl>
-
       <div className="pt-8 mt-8 border-t border-[var(--color-rule)]">
         <div className="flex items-center justify-between">
           <Label>Opened</Label>
@@ -126,7 +100,6 @@ function VolumePlate({ goal }: { goal: GoalData }) {
     </aside>
   );
 }
-
 function Stat({ label, value, suffix }: { label: string; value: number; suffix: string }) {
   const n = useCountUp(value);
   return (
@@ -139,11 +112,7 @@ function Stat({ label, value, suffix }: { label: string; value: number; suffix: 
     </div>
   );
 }
-
 function ArchivalStreakStat({ label, value, trigger, suffix }: { label: string; value: number; trigger?: number; suffix: string }) {
-  // We do not count up from 0. A physical archive displays the exact value.
-  // The animation triggers strictly when the trigger (entries length) changes.
-  
   return (
     <div>
       <Label>{label}</Label>
@@ -157,14 +126,14 @@ function ArchivalStreakStat({ label, value, trigger, suffix }: { label: string; 
               y: 0, 
               rotateX: 0,
               filter: 'blur(0px)',
-              textShadow: '0px 2px 2px rgba(0,0,0,0.1), 0px -1px 1px rgba(255,255,255,0.7)' // The blind emboss impression
+              textShadow: '0px 2px 2px rgba(0,0,0,0.1), 0px -1px 1px rgba(255,255,255,0.7)' 
             }}
             exit={{ opacity: 0, y: 25, rotateX: -60, filter: 'blur(3px)', textShadow: '0px 0px 0px rgba(0,0,0,0)' }}
             transition={{
               type: "spring",
               stiffness: 220,
               damping: 18,
-              mass: 2.5, // Heavy mechanical feel
+              mass: 2.5, 
             }}
             className="font-serif text-3xl leading-none block origin-center"
             style={{ perspective: 1000 }}
@@ -177,7 +146,6 @@ function ArchivalStreakStat({ label, value, trigger, suffix }: { label: string; 
     </div>
   );
 }
-
 function useCountUp(target: number, ms = 700) {
   const [n, setN] = React.useState(0);
   React.useEffect(() => {
@@ -194,22 +162,15 @@ function useCountUp(target: number, ms = 700) {
   }, [target, ms]);
   return n;
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Center — Manuscript writing surface
-// ─────────────────────────────────────────────────────────────────────────────
-
 function WritingSurface({ goal }: { goal: GoalData }) {
   const [text, setText] = React.useState("");
   const [isPending, startTransition] = React.useTransition();
   const [exitIntentFlash, setExitIntentFlash] = React.useState(false);
   const [stampedFragment, setStampedFragment] = React.useState<number | null>(null);
   const router = useRouter();
-  
   const words = text.trim() ? text.trim().split(/\s+/).length : 0;
   const today = new Date();
   const dateLabel = formatArchivalDate(today);
-
   React.useEffect(() => {
     const handleMouseLeave = (e: MouseEvent) => {
       // Trigger if mouse leaves viewport at the top and there's unsaved text
@@ -218,20 +179,17 @@ function WritingSurface({ goal }: { goal: GoalData }) {
         setTimeout(() => setExitIntentFlash(false), 2500);
       }
     };
-    
     document.addEventListener("mouseleave", handleMouseLeave);
     return () => document.removeEventListener("mouseleave", handleMouseLeave);
   }, [text, isPending]);
-
   const handleFileFragment = () => {
     if (!text.trim() || isPending) return;
-    
     startTransition(async () => {
       try {
         const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
         await addLogEntry(goal.id, text, tz);
         setStampedFragment(goal.entries.length + 1);
-        setTimeout(() => setStampedFragment(null), 2500); // Auto-hide after 2.5 seconds
+        setTimeout(() => setStampedFragment(null), 2500); 
         setText("");
         router.refresh();
       } catch (err) {
@@ -239,21 +197,17 @@ function WritingSurface({ goal }: { goal: GoalData }) {
       }
     });
   };
-
   return (
     <section className="reveal reveal-delay-1 paper-sheet relative p-8 lg:p-14">
       <span className="paper-clip left-10 -top-3 hidden lg:block" aria-hidden />
-
       <header className="flex flex-wrap items-baseline justify-between gap-4">
         <div className="flex items-baseline gap-4">
           <Label>Manuscript · today</Label>
           <Ref>{dateLabel}</Ref>
         </div>
       </header>
-
       <FoldRule className="mt-6" />
-
-      {/* Ruled writing area */}
+      {}
       <motion.div 
         animate={stampedFragment ? { scale: [1, 0.995, 1], y: [0, 1, 0] } : {}}
         transition={stampedFragment ? { duration: 0.3, times: [0, 0.2, 1], ease: "easeOut", delay: 0.05 } : {}}
@@ -274,7 +228,6 @@ function WritingSurface({ goal }: { goal: GoalData }) {
             </motion.div>
           )}
         </AnimatePresence>
-
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0 rounded-[4px]"
@@ -306,17 +259,14 @@ function WritingSurface({ goal }: { goal: GoalData }) {
           className={`relative w-full resize-none bg-transparent pl-14 pr-4 font-serif text-[17px] leading-8 tracking-[0.005em] text-[var(--color-ink)] placeholder:italic placeholder:text-[var(--color-ink-soft)]/70 focus:outline-none ${isPending ? 'opacity-50 blur-[1px]' : ''}`}
           style={{ caretColor: "var(--color-burgundy)" }}
         />
-
-        {/* Fragment Stamp (appears after successful submission) */}
+        {}
         <AnimatePresence>
           {stampedFragment !== null && (
             <FragmentStamp key="stamp" fragmentNumber={stampedFragment} />
           )}
         </AnimatePresence>
       </motion.div>
-
       <FoldRule className="mt-8" />
-
       <footer className="mt-6 flex flex-wrap items-center justify-between gap-6">
         <div className="flex items-center gap-6">
           <div>
@@ -336,7 +286,6 @@ function WritingSurface({ goal }: { goal: GoalData }) {
             </div>
           </div>
         </div>
-
         <div className="flex items-center gap-4">
           <span className="font-mono text-[10px] tracking-[0.1em] opacity-30 hidden sm:inline">Cmd + Enter</span>
           <FileFragmentButton onFile={handleFileFragment} isPending={isPending} disabled={!text.trim()} />
@@ -345,17 +294,14 @@ function WritingSurface({ goal }: { goal: GoalData }) {
     </section>
   );
 }
-
 function FileFragmentButton({ onFile, isPending, disabled }: { onFile: () => void, isPending: boolean, disabled: boolean }) {
   const [stamped, setStamped] = React.useState(false);
-  
   const handleClick = () => {
     if (disabled || isPending) return;
     setStamped(true);
     onFile();
     setTimeout(() => setStamped(false), 1200);
   };
-
   return (
     <button
       type="button"
@@ -378,11 +324,6 @@ function FileFragmentButton({ onFile, isPending, disabled }: { onFile: () => voi
     </button>
   );
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Right column — Archive Utilities
-// ─────────────────────────────────────────────────────────────────────────────
-
 function ArchiveUtilities({ goal }: { goal: GoalData }) {
   return (
     <aside className="reveal reveal-delay-2 flex h-full flex-col gap-8">
@@ -390,25 +331,21 @@ function ArchiveUtilities({ goal }: { goal: GoalData }) {
       <AccessionSlip goal={goal} />
       <VaultDeposit goal={goal} />
       <MetadataLedger goal={goal} />
-      
       <div className="mt-8 flex justify-end opacity-30 hover:opacity-100 transition-opacity">
         <DestroyTracker goalId={goal.id} />
       </div>
     </aside>
   );
 }
-
 function EditionPlate({ goal }: { goal: GoalData }) {
   const [isPending, startTransition] = React.useTransition();
   const router = useRouter();
-
   const togglePublic = () => {
     startTransition(async () => {
       await toggleGoalVisibility(goal.id, !goal.isPublic);
       router.refresh();
     });
   };
-
   return (
     <div className="paper-sheet p-6">
       <div className="flex items-start justify-between">
@@ -445,17 +382,13 @@ function EditionPlate({ goal }: { goal: GoalData }) {
     </div>
   );
 }
-
 function AccessionSlip({ goal }: { goal: GoalData }) {
   const [copied, setCopied] = React.useState(false);
   const [host, setHost] = React.useState('archive.dev');
-  
   React.useEffect(() => {
     setHost(window.location.host);
   }, []);
-
   const url = `${host}/${goal.publicSlug}`;
-  
   return (
     <div className="paper-sheet relative p-6 pinned-tilt">
       <span className="pin-dot absolute left-4 top-3" aria-hidden />
@@ -496,16 +429,13 @@ function AccessionSlip({ goal }: { goal: GoalData }) {
     </div>
   );
 }
-
 function VaultDeposit({ goal }: { goal: GoalData }) {
   const [email, setEmail] = React.useState("");
   const [state, setState] = React.useState<"idle" | "submitting" | "received">("idle");
-  
   React.useEffect(() => {
     const saved = localStorage.getItem('backup_email_v1');
     if (saved) setEmail(saved);
   }, []);
-
   const handleSubmit = async () => {
     if (!email || !email.includes('@')) return;
     setState("submitting");
@@ -520,7 +450,6 @@ function VaultDeposit({ goal }: { goal: GoalData }) {
       setState("idle");
     }
   };
-
   return (
     <div className="paper-sheet p-6">
       <div>
@@ -530,9 +459,7 @@ function VaultDeposit({ goal }: { goal: GoalData }) {
       <p className="mt-3 max-w-[30ch] font-serif text-[13px] italic leading-snug text-[var(--color-ink-soft)]">
         A backup copy will be dispatched, sealed, to the address below.
       </p>
-
       <FoldRule className="my-5" />
-
       <div className="space-y-4">
         <div>
           <Label>Address for dispatch</Label>
@@ -547,9 +474,7 @@ function VaultDeposit({ goal }: { goal: GoalData }) {
           </div>
         </div>
       </div>
-
       <FoldRule className="my-5" />
-
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div className="flex flex-col gap-0.5">
           <Ref>signed</Ref>
@@ -569,7 +494,6 @@ function VaultDeposit({ goal }: { goal: GoalData }) {
     </div>
   );
 }
-
 function MetadataLedger({ goal }: { goal: GoalData }) {
   const rows: Array<[string, React.ReactNode]> = [
     ["Created", <EditorialTime key="c" date={goal.createdAt} context="metadata" />],
@@ -600,15 +524,9 @@ function MetadataLedger({ goal }: { goal: GoalData }) {
     </div>
   );
 }
-// ─────────────────────────────────────────────────────────────────────────────
-// Progress — The "Shelf Index" archive visualization
-// ─────────────────────────────────────────────────────────────────────────────
-
 function CalendarHeatmap({ goal }: { goal: GoalData }) {
   const [currentDate, setCurrentDate] = React.useState(() => new Date());
   const [hoveredDay, setHoveredDay] = React.useState<{ date: string, count: number } | null>(null);
-
-  // Group entries by YYYY-MM-DD
   const entriesByDate = React.useMemo(() => {
     const map: Record<string, number> = {};
     goal.entries.forEach(entry => {
@@ -618,26 +536,18 @@ function CalendarHeatmap({ goal }: { goal: GoalData }) {
     });
     return map;
   }, [goal.entries]);
-
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
-
   const startOfMonth = new Date(year, month, 1);
   const endOfMonth = new Date(year, month + 1, 0);
   const daysInMonth = endOfMonth.getDate();
-  const startDayOfWeek = startOfMonth.getDay(); // 0 = Sunday
-
+  const startDayOfWeek = startOfMonth.getDay(); 
   const monthName = currentDate.toLocaleString('default', { month: 'long' });
-
   const prevMonth = () => setCurrentDate(new Date(year, month - 1, 1));
   const nextMonth = () => setCurrentDate(new Date(year, month + 1, 1));
   const isCurrentMonth = new Date().getFullYear() === year && new Date().getMonth() === month;
-
-  // Build grid: pad with nulls for empty days at start
   const grid = Array.from({ length: startDayOfWeek }).map(() => null)
     .concat(Array.from({ length: daysInMonth }).map((_, i) => i + 1));
-
-  // Refined designer ink scale
   const getDotStyle = (count: number) => {
     if (count === 0) return { 
       background: 'transparent', 
@@ -664,13 +574,10 @@ function CalendarHeatmap({ goal }: { goal: GoalData }) {
       border: '1px solid oklch(0.2 0.1 20)' 
     };
   };
-
   const filedThisMonth = Array.from({ length: daysInMonth }).map((_, i) => {
     const key = `${year}-${String(month + 1).padStart(2, '0')}-${String(i + 1).padStart(2, '0')}`;
     return entriesByDate[key] || 0;
   }).reduce((a, b) => a + b, 0);
-
-  // Stagger animation container
   const container = {
     hidden: { opacity: 0 },
     show: {
@@ -678,12 +585,10 @@ function CalendarHeatmap({ goal }: { goal: GoalData }) {
       transition: { staggerChildren: 0.015 }
     }
   };
-
   const item = {
     hidden: { opacity: 0, scale: 0.8 },
     show: { opacity: 1, scale: 1, transition: { type: "spring", stiffness: 350, damping: 25 } }
   };
-
   return (
     <section className="reveal reveal-delay-3 paper-sheet relative p-8 lg:p-10">
       <div className="flex flex-wrap items-baseline justify-between gap-4 relative z-10 min-h-[48px]">
@@ -692,8 +597,7 @@ function CalendarHeatmap({ goal }: { goal: GoalData }) {
           title="The Calendar"
           hint="each dot · one day filed"
         />
-        
-        {/* Dynamic Editorial Metadata Panel */}
+        {}
         <div className="flex items-baseline gap-6 min-w-[140px] justify-end text-right">
           <AnimatePresence mode="wait">
             {hoveredDay ? (
@@ -728,9 +632,7 @@ function CalendarHeatmap({ goal }: { goal: GoalData }) {
           </AnimatePresence>
         </div>
       </div>
-
       <FoldRule className="mt-4 mb-8 relative z-10" />
-
       <div className="flex items-center justify-between mb-8 relative z-10">
         <h3 className="font-serif text-[22px] md:text-2xl text-[var(--color-ink)] flex items-center gap-3">
           <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-burgundy)] opacity-60" />
@@ -745,7 +647,6 @@ function CalendarHeatmap({ goal }: { goal: GoalData }) {
           </button>
         </div>
       </div>
-
       <div className="relative z-10">
         <motion.div 
           key={`${year}-${month}`} 
@@ -763,14 +664,10 @@ function CalendarHeatmap({ goal }: { goal: GoalData }) {
             if (day === null) {
               return <div key={`empty-${i}`} className="w-8 h-8 md:w-10 md:h-10 mx-auto" />;
             }
-
             const dateKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
             const count = entriesByDate[dateKey] || 0;
             const style = getDotStyle(count);
-            
-            // Is it today?
             const isToday = isCurrentMonth && day === new Date().getDate();
-
             return (
               <div 
                 key={`day-${day}`} 
@@ -798,18 +695,11 @@ function CalendarHeatmap({ goal }: { goal: GoalData }) {
     </section>
   );
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Recent fragments
-// ─────────────────────────────────────────────────────────────────────────────
-
 function RecentFragments({ goal }: { goal: GoalData }) {
   const [expanded, setExpanded] = React.useState(false);
   const [strikingIds, setStrikingIds] = React.useState<Set<string>>(new Set());
   const router = useRouter();
-  
   const displayedEntries = expanded ? goal.entries : goal.entries.slice(0, 5);
-
   const handleDeleteEntry = (id: string) => {
     setStrikingIds(prev => new Set(prev).add(id));
     setTimeout(async () => {
@@ -818,16 +708,14 @@ function RecentFragments({ goal }: { goal: GoalData }) {
         router.refresh();
       } catch (e) {
         console.error("Failed to delete entry", e);
-        // Remove from striking if failed
         setStrikingIds(prev => {
           const next = new Set(prev);
           next.delete(id);
           return next;
         });
       }
-    }, 600); // Wait for red pen strike animation
+    }, 600); 
   };
-
   return (
     <section className="reveal reveal-delay-3 paper-sheet p-8 lg:p-10">
       <SectionHeading index="§ IV" title="Recent fragments" hint="most recent first" />
@@ -873,13 +761,11 @@ function RecentFragments({ goal }: { goal: GoalData }) {
                     <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
-                
                 <div className="relative mt-2 max-w-[62ch]">
                   <p className={`font-serif text-[15px] leading-7 text-[var(--color-ink)] whitespace-pre-wrap transition-opacity duration-500 ${strikingIds.has(e.id) ? 'opacity-30' : ''}`}>
                     {e.content}
                   </p>
-                  
-                  {/* Ledger Strikethrough Animation (Red Pen) */}
+                  {}
                   <motion.div
                     initial={{ scaleX: 0 }}
                     animate={{ scaleX: strikingIds.has(e.id) ? 1 : 0 }}
@@ -909,11 +795,6 @@ function RecentFragments({ goal }: { goal: GoalData }) {
     </section>
   );
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Helpers
-// ─────────────────────────────────────────────────────────────────────────────
-
 function formatArchivalDate(d: Date) {
   const roman = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII"][
     d.getMonth()
@@ -921,15 +802,10 @@ function formatArchivalDate(d: Date) {
   const weekday = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][d.getDay()];
   return `${String(d.getDate()).padStart(2, "0")} · ${roman} · ${weekday}`;
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Root
-// ─────────────────────────────────────────────────────────────────────────────
-
 export default function EditWorkspaceRedesign({ goal }: { goal: GoalData }) {
   return (
     <div className="min-h-screen w-full bg-[var(--color-background)] text-[var(--color-ink)] pb-32">
-      {/* Running head */}
+      {}
       <div className="mx-auto flex max-w-[1360px] items-baseline justify-between px-6 pt-10 lg:px-12">
         <div className="flex items-baseline gap-4">
           <Ref>SYNC · ARCHIVE</Ref>
@@ -938,41 +814,34 @@ export default function EditWorkspaceRedesign({ goal }: { goal: GoalData }) {
         </div>
         <Ref>Recto</Ref>
       </div>
-
-      {/* The desk */}
+      {}
       <main className="mx-auto grid max-w-[1360px] grid-cols-12 gap-6 px-6 pb-24 pt-8 lg:gap-8 lg:px-12">
-        {/* Left — Volume plate */}
+        {}
         <div className="col-span-12 lg:col-span-3">
           <VolumePlate goal={goal} />
         </div>
-
-        {/* Center — Writing surface */}
+        {}
         <div className="col-span-12 lg:col-span-6">
           <WritingSurface goal={goal} />
         </div>
-
-        {/* Right — Archive utilities */}
+        {}
         <div className="col-span-12 lg:col-span-3">
           <ArchiveUtilities goal={goal} />
         </div>
-
-        {/* Full width — Shelf Index (progress) */}
+        {}
         <div className="col-span-12 mt-4">
           <CalendarHeatmap goal={goal} />
         </div>
-
-        {/* Full width — Recent fragments */}
+        {}
         <div className="col-span-12 mt-2">
           <RecentFragments goal={goal} />
         </div>
-
-        {/* Full width — Command Line Access */}
+        {}
         <div className="col-span-12 mt-6">
           <CommandLineAccess goalId={goal.id} automation={goal.automation} />
         </div>
       </main>
-
-      {/* Colophon */}
+      {}
       <footer className="mx-auto flex max-w-[1360px] items-baseline justify-between border-t border-[var(--color-rule)] px-6 py-8 lg:px-12">
         <Ref>colophon · set in Fraunces & Inter Tight</Ref>
         <Ref>№ {goal.id.split('-')[0].toUpperCase()} · shelf {goal.id.slice(0, 2).toUpperCase()}</Ref>
@@ -980,18 +849,11 @@ export default function EditWorkspaceRedesign({ goal }: { goal: GoalData }) {
     </div>
   );
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Physical Fragment Stamp Animation
-// ─────────────────────────────────────────────────────────────────────────────
-
 function FragmentStamp({ fragmentNumber }: { fragmentNumber: number }) {
-  // Generate subtle physical randomness (always distinctly tilted by 30-40 degrees)
   const rotation = React.useMemo(() => (Math.random() > 0.5 ? 1 : -1) * (30 + Math.random() * 10), []); 
   const xOffset = React.useMemo(() => (Math.random() * 8 - 4), []);
   const yOffset = React.useMemo(() => (Math.random() * 8 - 4), []);
   const inkOpacity = React.useMemo(() => (0.88 + Math.random() * 0.12), []);
-
   return (
     <motion.div
       initial={{ x: xOffset, y: yOffset, opacity: 0 }}
@@ -1001,7 +863,7 @@ function FragmentStamp({ fragmentNumber }: { fragmentNumber: number }) {
       className="absolute inset-0 m-auto pointer-events-none z-50 flex items-center justify-center mix-blend-multiply w-fit h-fit"
       style={{ perspective: 1000 }}
     >
-      {/* 1. The Shadow (Simulates the descending handle) */}
+      {}
       <motion.div
         initial={{ opacity: 0.15, scale: 1.5, y: -40, rotateZ: rotation }}
         animate={{ 
@@ -1012,8 +874,7 @@ function FragmentStamp({ fragmentNumber }: { fragmentNumber: number }) {
         transition={{ duration: 0.75, times: [0, 0.2, 0.22, 1], ease: "easeIn" }}
         className="absolute w-24 h-24 bg-black rounded-full blur-md"
       />
-      
-      {/* 2. The Ink Transfer (Impact at 20% of timeline, persists) */}
+      {}
       <motion.div
         initial={{ opacity: 0, scale: 1.05, rotateZ: rotation, filter: 'blur(3px)' }}
         animate={{ 
@@ -1023,7 +884,7 @@ function FragmentStamp({ fragmentNumber }: { fragmentNumber: number }) {
         }}
         transition={{ 
           duration: 0.75, 
-          times: [0, 0.2, 0.25, 1], // Impact is perfectly aligned with shadow vanishing
+          times: [0, 0.2, 0.25, 1], 
         }}
       >
         <svg width="180" height="180" viewBox="0 0 180 180" className="text-[var(--color-burgundy)] drop-shadow-sm">
@@ -1031,29 +892,25 @@ function FragmentStamp({ fragmentNumber }: { fragmentNumber: number }) {
               <filter id="distress" x="-10%" y="-10%" width="120%" height="120%">
                 <feTurbulence type="fractalNoise" baseFrequency="0.7" numOctaves="3" result="noise" />
                 <feDisplacementMap in="SourceGraphic" in2="noise" scale="3" xChannelSelector="R" yChannelSelector="G" result="displaced" />
-                {/* Add a tiny bit of opacity noise for texture without destroying legibility */}
+                {}
                 <feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 2 -0.2" in="noise" result="opacityNoise" />
                 <feComposite operator="in" in="displaced" in2="opacityNoise" result="textured" />
               </filter>
               <path id="text-curve" d="M 42,95 A 48,48 0 0,0 138,95" fill="none" />
            </defs>
-
            <g filter="url(#distress)" fill="currentColor">
-             {/* Outer Rings */}
+             {}
              <circle cx="90" cy="90" r="70" fill="none" stroke="currentColor" strokeWidth="4" />
              <circle cx="90" cy="90" r="62" fill="none" stroke="currentColor" strokeWidth="1.5" strokeDasharray="14 4" opacity="0.8" />
-             
-             {/* Flame Center */}
+             {}
              <g transform="translate(62, 32) scale(2.4)">
                <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z" />
              </g>
-
-             {/* Fragment Number inside the Flame Base */}
+             {}
              <text x="90" y="99" fontSize="18" fontFamily="var(--font-serif)" fontWeight="bold" textAnchor="middle" fill="var(--color-paper)" letterSpacing="0">
                {fragmentNumber}
              </text>
-
-             {/* Curved Text */}
+             {}
              <text fontSize="16" fontFamily="var(--font-sans)" fontWeight="700" letterSpacing="6" fill="currentColor">
                <textPath href="#text-curve" startOffset="50%" textAnchor="middle">
                  FRAGMENT

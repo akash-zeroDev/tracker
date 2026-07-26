@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { cn } from '@/lib/utils';
-
 export const Spinner = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
     <div
@@ -34,7 +33,6 @@ export const Spinner = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTM
   )
 );
 Spinner.displayName = 'Spinner';
-
 export const Skeleton = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
     <div
@@ -45,11 +43,9 @@ export const Skeleton = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HT
   )
 );
 Skeleton.displayName = 'Skeleton';
-
 export interface BadgeProps extends React.HTMLAttributes<HTMLDivElement> {
   variant?: 'default' | 'success' | 'warning' | 'critical';
 }
-
 export const Badge = React.forwardRef<HTMLDivElement, BadgeProps>(
   ({ className, variant = 'default', ...props }, ref) => {
     return (
@@ -69,11 +65,9 @@ export const Badge = React.forwardRef<HTMLDivElement, BadgeProps>(
   }
 );
 Badge.displayName = 'Badge';
-
 export interface StatusIndicatorProps extends React.HTMLAttributes<HTMLDivElement> {
   status?: 'active' | 'pending' | 'offline' | 'error';
 }
-
 export const StatusIndicator = React.forwardRef<HTMLDivElement, StatusIndicatorProps>(
   ({ className, status = 'offline', ...props }, ref) => {
     return (

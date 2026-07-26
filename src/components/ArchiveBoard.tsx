@@ -1,8 +1,6 @@
 'use client';
-
 import { useMemo, useState } from "react";
 import { motion, LayoutGroup } from "framer-motion";
-
 type Kind =
   | "note"
   | "index"
@@ -14,7 +12,6 @@ type Kind =
   | "certificate"
   | "catalog"
   | "clipping";
-
 type Artifact = {
   id: string;
   kind: Kind;
@@ -38,10 +35,8 @@ type Artifact = {
   offsetY: number;
   z: number;
 };
-
 const TABS = ["All", "Projects", "Learning", "Reviews", "Milestones", "Research", "Reading", "Design"] as const;
 type Tab = typeof TABS[number];
-
 const KIND_TO_TAB: Record<Kind, Tab> = {
   note: "Learning",
   index: "Research",
@@ -54,26 +49,20 @@ const KIND_TO_TAB: Record<Kind, Tab> = {
   catalog: "Reading",
   clipping: "Research",
 };
-
 function fmtDate(iso: string) {
   const d = new Date(iso);
   const mon = d.toLocaleString("en", { month: "short" }).toUpperCase();
   return `${String(d.getDate()).padStart(2, "0")} · ${mon} · ${d.getFullYear()}`;
 }
-
 function daysAgo(iso: string) {
   const d = new Date(iso).getTime();
   return Math.floor((Date.now() - d) / 86_400_000);
 }
-
 import { GoalData } from "./EditWorkspaceRedesign";
-
 const KINDS: Kind[] = [
   "note", "index", "notebook", "scrap", "letter", 
   "blueprint", "sealed", "certificate", "catalog", "clipping"
 ];
-
-// Simple deterministic hash for stable visual randomization
 function hashString(str: string): number {
   let hash = 0;
   for (let i = 0; i < str.length; i++) {
@@ -83,61 +72,47 @@ function hashString(str: string): number {
   }
   return Math.abs(hash);
 }
-
 export function ArchiveBoard({ goal }: { goal?: GoalData }) {
   const [tab, setTab] = useState<Tab>("All");
   const [query, setQuery] = useState("");
   const [openId, setOpenId] = useState<string | null>(null);
-  
   // Month navigation state
   const [currentDate, setCurrentDate] = useState(() => new Date());
-  
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
-  
   const monthName = currentDate.toLocaleString('default', { month: 'long' });
   const isCurrentMonth = new Date().getFullYear() === year && new Date().getMonth() === month;
-  
   const prevMonth = () => setCurrentDate(new Date(year, month - 1, 1));
   const nextMonth = () => setCurrentDate(new Date(year, month + 1, 1));
-
   const liveArtifacts = useMemo(() => {
     if (!goal || !goal.entries) return [];
-
     // Filter entries for the selected month
     const monthEntries = goal.entries.filter(entry => {
       const d = new Date(entry.createdAt);
       return d.getFullYear() === year && d.getMonth() === month;
     });
-
     return monthEntries.map((entry, index): Artifact => {
       const h = hashString(entry.id);
-      
       // Deterministically pick kind based on ID hash to preserve variety
       const kind = KINDS[h % KINDS.length];
       const category = KIND_TO_TAB[kind];
-      
       // Layout generation
       const colsPerRow = 3;
       const colIndex = index % colsPerRow; // 0, 1, 2
       const rowIndex = Math.floor(index / colsPerRow);
-      
       // We want a slightly staggered masonry-ish feel
       const col = (colIndex * 4) + 1; // 1, 5, 9
       const row = (rowIndex * 3) + 1; // 1, 4, 7
       const colSpan = 3 + (h % 2); // 3 or 4 columns wide
       const rowSpan = 2 + ((h >> 1) % 2); // 2 or 3 rows tall
-      
       const rotate = ((h % 7) - 3) * 1.5; // -4.5 to 4.5 degrees
       const offsetX = ((h >> 2) % 11) - 5; // -5 to 5 px
       const offsetY = ((h >> 3) % 9) - 4; // -4 to 4 px
-
       // Generate a title from the content (first ~6 words)
       const words = entry.content.split(/\s+/);
       const title = words.length > 6 
         ? words.slice(0, 6).join(" ") + "..."
         : words.join(" ") || `Folio ${goal.entries.length - index}`;
-
       return {
         id: entry.id,
         kind,
@@ -159,7 +134,6 @@ export function ArchiveBoard({ goal }: { goal?: GoalData }) {
       };
     });
   }, [goal, year, month]);
-
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     return liveArtifacts.filter((a) => {
@@ -176,7 +150,6 @@ export function ArchiveBoard({ goal }: { goal?: GoalData }) {
       );
     });
   }, [tab, query]);
-
   return (
     <div className="w-full">
       <div className="mx-auto max-w-[1400px] px-6 pt-10 pb-6">
@@ -195,7 +168,6 @@ export function ArchiveBoard({ goal }: { goal?: GoalData }) {
             <span>Ref · AB-01</span>
           </div>
         </div>
-
         <div className="mt-8 flex flex-col md:flex-row items-start md:items-end justify-between gap-4">
           <div className="flex flex-wrap items-end gap-0 border-b border-[color:var(--color-rule)]">
             {TABS.map((t) => (
@@ -208,7 +180,6 @@ export function ArchiveBoard({ goal }: { goal?: GoalData }) {
               </button>
             ))}
           </div>
-          
           <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
             <div className="flex items-center gap-3 bg-[var(--color-paper-deep)] px-3 py-1.5 rounded-full border border-[var(--color-rule)]">
               <button onClick={prevMonth} className="text-[var(--color-ink-soft)] hover:text-[var(--color-ink)] transition-colors">
@@ -221,7 +192,6 @@ export function ArchiveBoard({ goal }: { goal?: GoalData }) {
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 18l6-6-6-6"/></svg>
               </button>
             </div>
-
             <label className="flex items-baseline gap-3 min-w-[260px]">
               <span className="label-caps whitespace-nowrap">Catalog ·</span>
               <input
@@ -234,7 +204,6 @@ export function ArchiveBoard({ goal }: { goal?: GoalData }) {
           </div>
         </div>
       </div>
-
       <div className="mx-auto max-w-[1400px] px-6 pb-24">
         <Board artifacts={filtered} openId={openId} setOpenId={setOpenId} />
         <div className="mt-8 flex items-center justify-between text-[color:var(--color-ink-soft)]">
@@ -245,7 +214,6 @@ export function ArchiveBoard({ goal }: { goal?: GoalData }) {
     </div>
   );
 }
-
 function Board({
   artifacts,
   openId,
@@ -303,7 +271,6 @@ function Board({
     </div>
   );
 }
-
 function ArtifactCell({
   artifact,
   index,
@@ -317,7 +284,6 @@ function ArtifactCell({
 }) {
   const age = daysAgo(artifact.date);
   const fade = Math.min(0.28, Math.max(0, (age - 30) / 900));
-
   return (
     <motion.button
       type="button"
@@ -348,7 +314,6 @@ function ArtifactCell({
     </motion.button>
   );
 }
-
 function ArtifactPaper({ artifact, open, fade }: { artifact: Artifact; open: boolean; fade: number }) {
   const paperTone = (() => {
     switch (artifact.kind) {
@@ -364,7 +329,6 @@ function ArtifactPaper({ artifact, open, fade }: { artifact: Artifact; open: boo
       case "clipping": return "oklch(0.9 0.022 82)";
     }
   })();
-
   return (
     <div
       className="relative h-full w-full transition-shadow duration-200 group-hover:shadow-[0_20px_40px_-24px_oklch(0.2_0.02_80/0.45)]"
@@ -381,13 +345,11 @@ function ArtifactPaper({ artifact, open, fade }: { artifact: Artifact; open: boo
         style={{ background: `oklch(0.35 0.04 60 / ${fade})`, mixBlendMode: "multiply" }}
       />
       <Fastener kind={artifact.kind} />
-
       <div className="relative p-3 md:p-4 h-full flex flex-col">
         <KindHeader artifact={artifact} />
         <div className="mt-2 font-serif text-[15px] md:text-[17px] leading-snug text-[color:var(--color-ink)] line-clamp-3">
           {artifact.title}
         </div>
-
         {!open ? (
           <div className="mt-auto pt-2 flex items-end justify-between gap-2">
             <span className="ref-id">{artifact.id}</span>
@@ -397,12 +359,10 @@ function ArtifactPaper({ artifact, open, fade }: { artifact: Artifact; open: boo
           <ExpandedContent artifact={artifact} />
         )}
       </div>
-
       {(artifact.kind === "letter" || artifact.kind === "clipping") && <FoldedCorner />}
     </div>
   );
 }
-
 function KindHeader({ artifact }: { artifact: Artifact }) {
   const label: Record<Kind, string> = {
     note: "Note",
@@ -428,7 +388,6 @@ function KindHeader({ artifact }: { artifact: Artifact }) {
     </div>
   );
 }
-
 function ExpandedContent({ artifact }: { artifact: Artifact }) {
   const isBlueprint = artifact.kind === "blueprint";
   return (
@@ -465,7 +424,6 @@ function ExpandedContent({ artifact }: { artifact: Artifact }) {
     </motion.div>
   );
 }
-
 function Fastener({ kind }: { kind: Kind }) {
   switch (kind) {
     case "note": return <Pin />;
@@ -480,7 +438,6 @@ function Fastener({ kind }: { kind: Kind }) {
     case "clipping": return <Tape torn />;
   }
 }
-
 function Pin({ right = false, small = false }: { right?: boolean; small?: boolean }) {
   const size = small ? 10 : 14;
   return (
@@ -502,7 +459,6 @@ function Pin({ right = false, small = false }: { right?: boolean; small?: boolea
     />
   );
 }
-
 function Clip({ binder = false }: { binder?: boolean }) {
   return (
     <span
@@ -521,7 +477,6 @@ function Clip({ binder = false }: { binder?: boolean }) {
     />
   );
 }
-
 function Tape({ torn = false }: { torn?: boolean }) {
   return (
     <span
@@ -543,7 +498,6 @@ function Tape({ torn = false }: { torn?: boolean }) {
     />
   );
 }
-
 function Ribbon() {
   return (
     <span
@@ -561,7 +515,6 @@ function Ribbon() {
     />
   );
 }
-
 function WaxSeal() {
   return (
     <span
@@ -584,7 +537,6 @@ function WaxSeal() {
     </span>
   );
 }
-
 function PunchHole() {
   return (
     <span
@@ -602,7 +554,6 @@ function PunchHole() {
     />
   );
 }
-
 function FoldedCorner() {
   return (
     <span

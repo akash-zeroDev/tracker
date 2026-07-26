@@ -2,19 +2,15 @@ import React from 'react';
 import { ArchiveManifest } from './ArchiveManifest';
 import { getArchiveStats } from '@/app/actions';
 import { InkText, InkBlock, InkRule } from './transitions/InkPrimitives';
-
 export function RefId({ children, className = '' }: { children: React.ReactNode, className?: string }) {
   return <InkText className={`ref-id ${className}`}>{children}</InkText>;
 }
-
 export function Label({ children, className = '' }: { children: React.ReactNode, className?: string }) {
   return <InkText className={`label-caps ${className}`}>{children}</InkText>;
 }
-
 export function Stamp({ children, className = '' }: { children: React.ReactNode, className?: string }) {
   return <InkText className={`archive-stamp ${className}`}>{children}</InkText>;
 }
-
 export function MarginNote({ children }: { children: React.ReactNode }) {
   return (
     <InkText className="block font-serif italic text-[0.82rem] leading-snug text-[color:var(--color-ink-soft)]">
@@ -22,11 +18,9 @@ export function MarginNote({ children }: { children: React.ReactNode }) {
     </InkText>
   );
 }
-
 export function FoldRule({ className = "" }: { className?: string }) {
   return <InkRule className={className} />;
 }
-
 export function SectionHeading({
   index,
   title,
@@ -46,7 +40,6 @@ export function SectionHeading({
     </div>
   );
 }
-
 export function ReferenceSnippet({
   id,
   source,
@@ -69,10 +62,8 @@ export function ReferenceSnippet({
     </figure>
   );
 }
-
 export async function ComponentAtlas() {
   const stats = await getArchiveStats();
-  
   return (
     <section className="mx-auto max-w-[1180px] px-8 py-32">
       <div className="flex items-end justify-between mb-8">
@@ -93,7 +84,6 @@ export async function ComponentAtlas() {
     </section>
   );
 }
-
 export function Stitch({ intensity }: { intensity: number }) {
   if (intensity === 0) {
     return (
@@ -114,7 +104,6 @@ export function Stitch({ intensity }: { intensity: number }) {
     />
   );
 }
-
 export function ReadingMarkers() {
   const items = [
     { id: "B-11", title: "A Pattern Language", page: "p. 214 / 1171" },

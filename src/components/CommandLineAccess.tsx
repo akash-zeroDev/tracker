@@ -1,8 +1,6 @@
 'use client';
-
 import * as React from 'react';
 import { enableAutomation, disableAutomation, rotateAutomationKey } from '@/app/actions';
-
 export interface AutomationData {
   isEnabled: boolean;
   keyPrefix: string | null;
@@ -10,14 +8,11 @@ export interface AutomationData {
   lastUsedAt: Date | null;
   createdAt: Date;
 }
-
 interface Props {
   goalId: string;
   automation: AutomationData | null;
 }
-
 type CLATab = 'curl' | 'js' | 'python' | 'bash' | 'github';
-
 function Label({ children }: { children: React.ReactNode }) {
   return <span className="label-caps">{children}</span>;
 }
@@ -27,7 +22,6 @@ function Ref({ children }: { children: React.ReactNode }) {
 function FoldRule({ className = '' }: { className?: string }) {
   return <div className={`h-px w-full bg-[var(--color-rule)] ${className}`} aria-hidden />;
 }
-
 export function CommandLineAccess({ goalId, automation: initialAutomation }: Props) {
   const [automation, setAutomation] = React.useState(initialAutomation);
   const [rawKey, setRawKey] = React.useState<string | null>(null);
@@ -37,11 +31,9 @@ export function CommandLineAccess({ goalId, automation: initialAutomation }: Pro
   const [showKey, setShowKey] = React.useState(false);
   const [activeTab, setActiveTab] = React.useState<CLATab>('curl');
   const [host, setHost] = React.useState('your-domain.com');
-
   React.useEffect(() => {
     setHost(window.location.host);
   }, []);
-
   const isLocalhost = host.startsWith('localhost') || host.startsWith('127.0.0.1');
   const protocol = isLocalhost ? 'http' : 'https';
   const endpoint = `${protocol}://${host}/api/v1/folios/${goalId}/log`;
@@ -49,7 +41,6 @@ export function CommandLineAccess({ goalId, automation: initialAutomation }: Pro
   const maskedKey = rawKey
     ? (showKey ? rawKey : `${rawKey.slice(0, 16)}${'•'.repeat(38)}`)
     : (automation?.keyPrefix ? `${automation.keyPrefix}${'•'.repeat(38)}` : '<YOUR_API_KEY>');
-
   const handleEnable = () => {
     startTransition(async () => {
       const result = await enableAutomation(goalId);
@@ -64,7 +55,6 @@ export function CommandLineAccess({ goalId, automation: initialAutomation }: Pro
       });
     });
   };
-
   const handleDisable = () => {
     startTransition(async () => {
       await disableAutomation(goalId);
@@ -72,7 +62,6 @@ export function CommandLineAccess({ goalId, automation: initialAutomation }: Pro
       setAutomation(prev => prev ? { ...prev, isEnabled: false } : null);
     });
   };
-
   const handleRotate = () => {
     startTransition(async () => {
       const result = await rotateAutomationKey(goalId);
@@ -85,29 +74,24 @@ export function CommandLineAccess({ goalId, automation: initialAutomation }: Pro
       } : null);
     });
   };
-
   const copyKey = () => {
     if (!rawKey) return;
     navigator.clipboard.writeText(rawKey);
     setCopiedKey(true);
     setTimeout(() => setCopiedKey(false), 1500);
   };
-
   const copyCmd = (text: string) => {
     navigator.clipboard.writeText(text);
     setCopiedCmd(true);
     setTimeout(() => setCopiedCmd(false), 1500);
   };
-
   const keyForCmd = rawKey ?? '<YOUR_API_KEY>';
   const tz = typeof Intl !== 'undefined' ? Intl.DateTimeFormat().resolvedOptions().timeZone : 'UTC';
-
   const codeMap: Record<CLATab, string> = {
     curl: `curl -X POST ${endpoint} \\
   -H "Authorization: Bearer ${keyForCmd}" \\
   -H "Content-Type: application/json" \\
   -d '{"content": "Finished a deep work session. 2h focus block.", "timezone": "${tz}"}'`,
-
     js: `const response = await fetch('${endpoint}', {
   method: 'POST',
   headers: {
@@ -121,9 +105,7 @@ export function CommandLineAccess({ goalId, automation: initialAutomation }: Pro
 });
 const data = await response.json();
 console.log(data.fragment.id);`,
-
     python: `import requests
-
 response = requests.post(
     "${endpoint}",
     headers={
@@ -136,7 +118,6 @@ response = requests.post(
     },
 )
 print(response.json())`,
-
     bash: `#!/bin/bash
 # Drop this in a Git post-commit hook or cron job.
 pa-log() {
@@ -145,9 +126,7 @@ pa-log() {
     -H "Content-Type: application/json" \\
     -d "{\\"content\\": \\"$1\\"}"
 }
-
 pa-log "Shipped the feature. 3 focused hours."`,
-
     github: `# .github/workflows/log.yml
 name: Log to Precision Archive
 on:
@@ -164,14 +143,12 @@ jobs:
             -H "Content-Type: application/json" \\
             -d '{"content": "Pushed to main: \${{ github.event.head_commit.message }}"}'`,
   };
-
   const tabLabels: Record<CLATab, string> = {
     curl: 'cURL', js: 'JavaScript', python: 'Python', bash: 'Bash', github: 'GitHub Actions',
   };
-
   return (
     <div className="paper-sheet p-6 lg:p-8">
-      {/* Header */}
+      {}
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <Label>Command Line Access</Label>
@@ -190,10 +167,8 @@ jobs:
           {isActive ? 'ACTIVE' : 'INACTIVE'}
         </span>
       </div>
-
       <FoldRule className="my-6" />
-
-      {/* Stats */}
+      {}
       {isActive && automation && (
         <div className="mb-6 flex flex-wrap gap-8">
           {([
@@ -212,11 +187,9 @@ jobs:
           ))}
         </div>
       )}
-
-      {/* Key management */}
+      {}
       <div className="space-y-3">
         <Label>Authentication key</Label>
-
         {!isActive ? (
           <div className="mt-3">
             <p className="font-mono text-[12px] text-[var(--color-ink-soft)] mb-4 leading-relaxed">
@@ -260,13 +233,11 @@ jobs:
                 </button>
               </div>
             </div>
-
             {rawKey && (
               <p className="font-mono text-[10px] tracking-[0.12em] text-[var(--color-burgundy)]">
                 ⚠ Copy this key now. It will not be shown again after you navigate away.
               </p>
             )}
-
             <div className="flex flex-wrap gap-4 pt-1">
               <button
                 type="button"
@@ -289,19 +260,16 @@ jobs:
           </div>
         )}
       </div>
-
       {isActive && (
         <>
           <FoldRule className="my-6" />
-
-          {/* Quick command */}
+          {}
           <div>
             <Label>Quick command</Label>
             <p className="mt-1 mb-2 font-serif text-[13px] italic text-[var(--color-ink-soft)] leading-snug">
               Copy a command below and change the <code className="font-mono text-[11px] not-italic">"content"</code> value to file your own custom log entry.
             </p>
-
-            {/* Tabs */}
+            {}
             <div className="mt-3 flex flex-wrap gap-0 border-b border-[var(--color-rule)]">
               {(Object.keys(tabLabels) as CLATab[]).map((tab) => (
                 <button
@@ -318,7 +286,6 @@ jobs:
                 </button>
               ))}
             </div>
-
             <div className="relative border border-t-0 border-[var(--color-rule)] bg-[var(--color-paper)]">
               <pre className="overflow-x-auto p-4 font-mono text-[11.5px] leading-relaxed text-[var(--color-ink)] whitespace-pre-wrap break-all">
                 <code>{codeMap[activeTab]}</code>
@@ -333,21 +300,17 @@ jobs:
               </button>
             </div>
           </div>
-
           <FoldRule className="my-6" />
-
-          {/* Reference table */}
+          {}
           <div>
             <Label>Reference</Label>
             <div className="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-
               <div>
                 <p className="font-mono text-[10px] tracking-[0.14em] uppercase text-[var(--color-ink-soft)] mb-2">Endpoint</p>
                 <code className="font-mono text-[11.5px] text-[var(--color-ink)] break-all">
                   POST /api/v1/folios/[folioId]/log
                 </code>
               </div>
-
               <div>
                 <p className="font-mono text-[10px] tracking-[0.14em] uppercase text-[var(--color-ink-soft)] mb-2">Required fields</p>
                 <dl className="space-y-1">
@@ -355,7 +318,6 @@ jobs:
                   <dd className="font-serif text-[12px] text-[var(--color-ink-soft)] italic">String · The fragment text to file.</dd>
                 </dl>
               </div>
-
               <div>
                 <p className="font-mono text-[10px] tracking-[0.14em] uppercase text-[var(--color-ink-soft)] mb-2">Optional fields</p>
                 <dl className="space-y-1">
@@ -363,12 +325,10 @@ jobs:
                   <dd className="font-serif text-[12px] text-[var(--color-ink-soft)] italic">IANA tz string. Defaults to UTC. Affects streak calculations.</dd>
                 </dl>
               </div>
-
               <div>
                 <p className="font-mono text-[10px] tracking-[0.14em] uppercase text-[var(--color-ink-soft)] mb-2">Response · 201</p>
                 <code className="font-mono text-[11px] text-[var(--color-ink)] leading-relaxed whitespace-pre-wrap">{`{ success: true,\n  fragment: { id, content,\n    createdAt, folioId } }`}</code>
               </div>
-
               <div>
                 <p className="font-mono text-[10px] tracking-[0.14em] uppercase text-[var(--color-ink-soft)] mb-2">Authentication</p>
                 <p className="font-serif text-[12px] text-[var(--color-ink-soft)] italic leading-snug">
@@ -376,7 +336,6 @@ jobs:
                   Keys are per-folio and can be rotated or revoked at any time.
                 </p>
               </div>
-
               <div>
                 <p className="font-mono text-[10px] tracking-[0.14em] uppercase text-[var(--color-ink-soft)] mb-2">Rate limits</p>
                 <p className="font-serif text-[12px] text-[var(--color-ink-soft)] italic leading-snug">
@@ -384,7 +343,6 @@ jobs:
                   Abuse results in immediate key revocation.
                 </p>
               </div>
-
             </div>
           </div>
         </>

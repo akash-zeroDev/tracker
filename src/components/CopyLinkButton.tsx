@@ -1,18 +1,14 @@
 'use client';
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/Button';
-
 import { Stamp } from '@/components/AtelierPrimitives';
 import { motion, AnimatePresence } from 'framer-motion';
-
 interface CopyLinkButtonProps {
   url: string;
   slug?: string;
   createdAt?: Date;
   className?: string;
 }
-
 export function CopyLinkButton({
   url,
   slug = 'folio',
@@ -20,7 +16,6 @@ export function CopyLinkButton({
   className = ''
 }: CopyLinkButtonProps) {
   const [copied, setCopied] = useState(false);
-
   const handleCopy = async () => {
     try {
       const fullUrl = url.startsWith('/') ? `${window.location.origin}${url}` : url;
@@ -31,18 +26,15 @@ export function CopyLinkButton({
       console.warn('Clipboard API failed', err);
     }
   };
-
   return (
     <div className={`tracing-paper paper-lift relative p-6 flex flex-col group cursor-pointer ${className}`} onClick={handleCopy}>
       <div className="flex justify-between items-start mb-4">
         <span className="label-caps opacity-60">PUBLIC EDITION</span>
         <span className="font-serif italic text-[0.75rem] opacity-40 group-hover:opacity-100 transition-opacity">Copy Link</span>
       </div>
-      
       <div className="font-mono text-[0.85rem] tracking-tight text-[color:var(--color-ink)] truncate mb-6 border-b border-dashed border-[color:var(--color-ink-soft)] pb-2">
         {url.startsWith('/') ? (typeof window !== 'undefined' ? window.location.host : 'archive.dev') : ''}{url}
       </div>
-
       <div className="flex justify-between items-end mt-auto">
         <div className="flex flex-col gap-1">
           <span className="font-serif text-[0.7rem] italic opacity-60">First printed</span>
@@ -53,8 +45,7 @@ export function CopyLinkButton({
           <span className="font-mono text-[0.75rem] uppercase">Public</span>
         </div>
       </div>
-
-      {/* The COPIED Stamp */}
+      {}
       <AnimatePresence>
         {copied && (
           <motion.div 

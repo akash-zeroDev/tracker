@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { cn } from '@/lib/utils';
 import { ErrorText, HelperText } from './typography';
-
 export const Input = React.forwardRef<HTMLInputElement, React.InputHTMLAttributes<HTMLInputElement>>(
   ({ className, type, 'aria-invalid': ariaInvalid, ...props }, ref) => (
     <input
@@ -21,7 +20,6 @@ export const Input = React.forwardRef<HTMLInputElement, React.InputHTMLAttribute
   )
 );
 Input.displayName = 'Input';
-
 export const Textarea = React.forwardRef<HTMLTextAreaElement, React.TextareaHTMLAttributes<HTMLTextAreaElement>>(
   ({ className, 'aria-invalid': ariaInvalid, ...props }, ref) => (
     <textarea
@@ -39,7 +37,6 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, React.TextareaHTML
   )
 );
 Textarea.displayName = 'Textarea';
-
 export const Checkbox = React.forwardRef<HTMLInputElement, React.InputHTMLAttributes<HTMLInputElement>>(
   ({ className, ...props }, ref) => (
     <input
@@ -54,7 +51,6 @@ export const Checkbox = React.forwardRef<HTMLInputElement, React.InputHTMLAttrib
   )
 );
 Checkbox.displayName = 'Checkbox';
-
 export const Switch = React.forwardRef<HTMLInputElement, React.InputHTMLAttributes<HTMLInputElement>>(
   ({ className, ...props }, ref) => (
     <input
@@ -70,7 +66,6 @@ export const Switch = React.forwardRef<HTMLInputElement, React.InputHTMLAttribut
   )
 );
 Switch.displayName = 'Switch';
-
 export const FieldGroup = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
     <div
@@ -81,12 +76,10 @@ export const FieldGroup = React.forwardRef<HTMLDivElement, React.HTMLAttributes<
   )
 );
 FieldGroup.displayName = 'FieldGroup';
-
 interface ValidationMessageProps extends React.HTMLAttributes<HTMLParagraphElement> {
   error?: string;
   helpText?: string;
 }
-
 export const ValidationMessage = React.forwardRef<HTMLParagraphElement, ValidationMessageProps>(
   ({ error, helpText, className, ...props }, ref) => {
     if (error) {

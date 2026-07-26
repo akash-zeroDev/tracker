@@ -1,25 +1,21 @@
 'use client';
-
 import React, { useState, useEffect, useTransition } from 'react';
 import { Button } from '@/components/ui/Button';
 import { Input, FieldGroup, ValidationMessage } from '@/components/ui/forms';
 import { sendBackupEmail } from '@/app/actions';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Label } from '@/components/AtelierPrimitives';
-
 export function EmailBackupCard({ editUrl }: { editUrl: string }) {
   const [email, setEmail] = useState('');
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | undefined>();
   const [isVaulted, setIsVaulted] = useState(false);
-
   useEffect(() => {
     const savedEmail = localStorage.getItem('backup_email_v1');
     if (savedEmail) {
       setEmail(savedEmail);
     }
   }, []);
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError(undefined);
@@ -27,7 +23,6 @@ export function EmailBackupCard({ editUrl }: { editUrl: string }) {
       setError('Please enter a valid email address.');
       return;
     }
-
     startTransition(async () => {
       try {
         localStorage.setItem('backup_email_v1', email);
@@ -40,13 +35,11 @@ export function EmailBackupCard({ editUrl }: { editUrl: string }) {
       }
     });
   };
-
   return (
     <div className="tracing-paper paper-lift p-6 flex flex-col relative overflow-hidden">
       <div className="flex justify-between items-center mb-6">
         <Label>SECRET VAULT</Label>
       </div>
-
       <AnimatePresence mode="wait">
         {isVaulted ? (
           <motion.div 
@@ -81,7 +74,6 @@ export function EmailBackupCard({ editUrl }: { editUrl: string }) {
             <p className="font-serif text-[0.8rem] leading-relaxed text-[color:var(--color-ink-soft)]">
               Your archive relies on local coordinates. Without this secret URL, your volume is lost if your browser clears.
             </p>
-            
             <div className="relative">
               <input
                 type="email"
@@ -93,7 +85,6 @@ export function EmailBackupCard({ editUrl }: { editUrl: string }) {
                 className="w-full bg-transparent border-b border-[color:var(--color-rule)] font-serif text-[0.95rem] py-2 focus:outline-none focus:border-[color:var(--color-ink)] transition-colors placeholder:italic placeholder:opacity-40"
               />
             </div>
-            
             <div className="flex justify-between items-center mt-2">
               <span className="text-[0.75rem] font-serif text-[color:var(--color-burgundy)]">{error}</span>
               <button

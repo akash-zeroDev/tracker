@@ -1,15 +1,12 @@
 'use client';
-
 import React, { useState, useEffect } from 'react';
 import { Label, RefId, MarginNote } from './AtelierPrimitives';
 import { usePathname } from 'next/navigation';
 import { ArchivalLink as Link } from '@/components/transitions/ArchivalLink';
 import { InkRegion } from '@/components/transitions/InkPrimitives';
 import { LiveFooter } from './LiveFooter';
-
 export function TopIndex() {
   const [timeStr, setTimeStr] = useState<string>('');
-  
   useEffect(() => {
     const updateTime = () => {
       const now = new Date();
@@ -19,19 +16,16 @@ export function TopIndex() {
       const timeOptions: Intl.DateTimeFormatOptions = {
         hour: '2-digit', minute: '2-digit'
       };
-      // e.g., "Sat 25 Jul 2026 · 03:35 PM"
       const formattedDate = now.toLocaleDateString('en-US', dateOptions).replace(/,/g, '');
       const formattedTime = now.toLocaleTimeString('en-US', timeOptions);
       setTimeStr(`${formattedDate} · ${formattedTime}`);
     };
     updateTime();
-    const interval = setInterval(updateTime, 10000); // update every 10s
+    const interval = setInterval(updateTime, 10000); 
     return () => clearInterval(interval);
   }, []);
-
   const currentYear = new Date().getFullYear();
   const pathname = usePathname();
-
   const tabs = [
     { label: "Desk", active: pathname === "/desk", href: "/desk" },
     { label: "Community", active: pathname === "/community", href: "/community" },
@@ -41,10 +35,10 @@ export function TopIndex() {
   return (
     <InkRegion priority={0}>
       <header className="border-b border-[color:var(--color-rule)] bg-[color:var(--color-paper)]/70 backdrop-blur-[1px]">
-        <div className="mx-auto flex max-w-[1180px] items-end justify-between px-8 pt-8 pb-0">
-          <div className="flex items-baseline gap-4 md:gap-6 mb-3">
+        <div className="mx-auto flex flex-col md:flex-row md:items-end justify-between max-w-[1180px] px-4 sm:px-8 pt-6 sm:pt-8 pb-0 gap-4 md:gap-0">
+          <div className="flex items-baseline gap-3 sm:gap-4 md:gap-6 md:mb-3">
             <span className="ref-id whitespace-nowrap">SYNC · Vol.{currentYear}</span>
-            <h1 className="font-serif text-[1.45rem] tracking-tight ml-2 md:ml-4">
+            <h1 className="font-serif text-[1.45rem] tracking-tight ml-auto md:ml-4">
               <Link href="/" className="cursor-pointer transition-colors hover:text-[color:var(--color-burgundy)]">
                 Sync
               </Link>
@@ -53,9 +47,9 @@ export function TopIndex() {
               {timeStr || 'est. MMXXI'}
             </span>
           </div>
-          <nav className="flex items-end gap-1">
+          <nav className="flex items-end gap-1 overflow-x-auto w-full md:w-auto pb-px flex-nowrap [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {tabs.map((t) => {
-              const className = (t.active ? "index-tab index-tab-active" : "index-tab tab-lift") + (t.href ? " cursor-pointer" : " cursor-default");
+              const className = (t.active ? "index-tab index-tab-active" : "index-tab tab-lift") + (t.href ? " cursor-pointer" : " cursor-default") + " shrink-0";
               if (t.href) {
                 return (
                   <Link href={t.href} key={t.label} className={className}>
@@ -75,7 +69,10 @@ export function TopIndex() {
     </InkRegion>
   );
 }
-
 export function Colophon() {
+  const pathname = usePathname();
+  if (pathname.startsWith('/edit')) {
+    return null;
+  }
   return <LiveFooter />;
 }

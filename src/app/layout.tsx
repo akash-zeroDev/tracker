@@ -3,11 +3,9 @@ import { TopIndex, Colophon } from '@/components/AtelierLayout';
 import { Inter_Tight, Fraunces, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 import { InkTransitionProvider } from '@/components/transitions/InkTransitionProvider';
-
 const inter = Inter_Tight({ subsets: ['latin'], variable: '--font-sans' });
 const fraunces = Fraunces({ subsets: ['latin'], variable: '--font-serif', axes: ['SOFT', 'WONK'] });
 const jetbrainsMono = JetBrains_Mono({ subsets: ['latin'], variable: '--font-mono' });
-
 export const metadata: Metadata = {
   title: {
     template: '%s | Sync',
@@ -27,7 +25,6 @@ export const metadata: Metadata = {
     description: 'Sync - Zero-friction public journal and streak tracker.',
   },
 };
-
 export default function RootLayout({
   children,
 }: Readonly<{

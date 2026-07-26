@@ -3,11 +3,8 @@ import { EntriesManuscript } from '@/components/EntriesManuscript';
 import { getAllEntries } from '@/app/actions';
 import { format } from 'date-fns';
 import { InkRegion } from '@/components/transitions/InkPrimitives';
-
-// Helper to calculate raw calendar day differences
 function getCalendarDayDifference(previousDate: Date | null, currentDate: Date): number {
   if (!previousDate) return Infinity;
-  // Strip time to compare pure UTC dates
   const prevStr = previousDate.toISOString().split('T')[0];
   const currStr = currentDate.toISOString().split('T')[0];
   const prev = new Date(`${prevStr}T00:00:00Z`).getTime();
@@ -15,52 +12,36 @@ function getCalendarDayDifference(previousDate: Date | null, currentDate: Date):
   const diffTime = Math.abs(curr - prev);
   return Math.floor(diffTime / (1000 * 60 * 60 * 24));
 }
-
 export default async function EntriesPage() {
   const allEntries = await getAllEntries();
-
-  // We need to group entries by goal to compute historical streaks
   const entriesByGoal: Record<string, typeof allEntries> = {};
   allEntries.forEach(entry => {
     if (!entriesByGoal[entry.goalId]) entriesByGoal[entry.goalId] = [];
     entriesByGoal[entry.goalId].push(entry);
   });
-
-  // Sort each goal's entries ascending to compute timeline milestones
   Object.values(entriesByGoal).forEach(list => {
     list.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
   });
-
   const finalRows: any[] = [];
   const monthlyStats: Record<string, { fragments: number, chain: number, mostStudied: string, counts: Record<string, number> }> = {};
-
   Object.values(entriesByGoal).forEach(goalEntries => {
     let currentStreak = 0;
     let highestStreakReached = 0;
-    
-    // We will track the indices of the entries that got specific streak tags
     let latestStreakTagIndex = -1;
-
     goalEntries.forEach((entry, idx) => {
       let specialType = "normal";
-
-      // 1. Calculate streak at this point in time
       const prevEntry = idx > 0 ? goalEntries[idx - 1] : null;
       const dayDiff = getCalendarDayDifference(prevEntry?.createdAt || null, entry.createdAt);
-      
       if (dayDiff === 0) {
-        // Same day, streak doesn't increase but doesn't break
       } else if (dayDiff === 1) {
         currentStreak += 1;
       } else {
         currentStreak = 1;
       }
-
-      // 2. Tagging Engine Logic
       if (idx === 0) {
         specialType = "new_subject";
       } else if (dayDiff > 7) {
-        specialType = "revival"; // Custom tag for coming back
+        specialType = "revival"; 
       } else if (entry.goal.status === "ARCHIVED" && idx === goalEntries.length - 1) {
         specialType = "archived";
       } else if (currentStreak >= 100 && highestStreakReached < 100) {
@@ -81,22 +62,16 @@ export default async function EntriesPage() {
       } else if ((entry.content?.length || 0) > 300) {
         specialType = "deep_focus";
       }
-
       const words = (entry.content || "").split(" ").length;
       const readingTime = Math.max(1, Math.ceil(words / 200)) + " min";
-
       const monthId = format(entry.createdAt, 'yyyy-MM');
-      
-      // Update monthly stats
       if (!monthlyStats[monthId]) {
         monthlyStats[monthId] = { fragments: 0, chain: 0, mostStudied: "", counts: {} };
       }
       monthlyStats[monthId].fragments += 1;
       monthlyStats[monthId].chain = Math.max(monthlyStats[monthId].chain, currentStreak);
-      
       const cat = entry.goal.category || "Uncategorized";
       monthlyStats[monthId].counts[cat] = (monthlyStats[monthId].counts[cat] || 0) + 1;
-
       finalRows.push({
         id: entry.id,
         goalId: entry.goalId,
@@ -115,8 +90,6 @@ export default async function EntriesPage() {
       });
     });
   });
-
-  // Calculate Most Studied for each month
   Object.values(monthlyStats).forEach(stat => {
     let top = "";
     let max = 0;
@@ -128,10 +101,8 @@ export default async function EntriesPage() {
     }
     stat.mostStudied = top;
   });
-
   // Sort completely by timestamp desc
   finalRows.sort((a, b) => b.timestamp - a.timestamp);
-
   const archiveStats = {
     fragmentsCount: allEntries.length,
     monthsRecorded: Object.keys(monthlyStats).length,
@@ -139,7 +110,6 @@ export default async function EntriesPage() {
     // Finding max streak overall for the header stat
     maxChain: Object.values(monthlyStats).reduce((max, m) => Math.max(max, m.chain), 0)
   };
-
   return (
     <main className="min-h-screen text-[color:var(--color-ink)] pb-32">
       <InkRegion priority={2}>

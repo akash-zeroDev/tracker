@@ -3,18 +3,14 @@ import { getGoalBySlug } from '@/app/actions';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import type { Metadata } from 'next';
-
 import { Label, RefId } from '@/components/AtelierPrimitives';
 import { PublicFragmentsList } from '@/components/PublicFragmentsList';
-
 export async function generateMetadata(
   props: { params: Promise<{ slug: string }> }
 ): Promise<Metadata> {
   const params = await props.params;
   const goal = await getGoalBySlug(params.slug);
-  
   if (!goal) return { title: 'Not Found' };
-  
   return {
     title: goal.title,
     description: `Track ${goal.title} on Sync.`,
@@ -24,15 +20,12 @@ export async function generateMetadata(
     },
   };
 }
-
 export default async function PublicGoalPage(props: { params: Promise<{ slug: string }> }) {
   const params = await props.params;
   const goal = await getGoalBySlug(params.slug);
-
   if (!goal) {
     notFound();
   }
-
   if (!goal.isPublic) {
     return (
       <main className="min-h-screen text-[color:var(--color-ink)] flex items-center justify-center p-8 bg-[color:var(--color-surface)]">
@@ -48,15 +41,11 @@ export default async function PublicGoalPage(props: { params: Promise<{ slug: st
       </main>
     );
   }
-
-  // Removed old lattice logic variables that are no longer used by Atelier design
-
   return (
     <main className="min-h-screen text-[color:var(--color-ink)]">
       <section className="bg-[color:var(--color-paper-deep)]/30 min-h-[80vh]">
         <div className="mx-auto grid max-w-[1180px] grid-cols-12 gap-10 px-8 py-24 md:py-32">
-          
-          {/* Left Description Column */}
+          {}
           <div className="col-span-12 md:col-span-4">
             <Label>Fig. 04 · Public link</Label>
             <h2 className="mt-5 font-serif text-[2.4rem] leading-[1.1] tracking-tight">
@@ -73,8 +62,7 @@ export default async function PublicGoalPage(props: { params: Promise<{ slug: st
               <span>{goal.publicSlug}</span>
             </div>
           </div>
-
-          {/* Right Bound Volume Column */}
+          {}
           <div className="col-span-12 md:col-span-8">
             <div className="paper-sheet paper-lift relative p-8 md:p-12">
               <span className="paper-clip -top-4 left-16" />
@@ -104,7 +92,6 @@ export default async function PublicGoalPage(props: { params: Promise<{ slug: st
                     )}
                   </ul>
                 </div>
-                
                 <div className="flex flex-col gap-10">
                   <PublicFragmentsList entries={goal.entries} />
                 </div>
@@ -113,8 +100,7 @@ export default async function PublicGoalPage(props: { params: Promise<{ slug: st
           </div>
         </div>
       </section>
-
-      {/* Sticky Viral CTA - Styled as an Atelier Slip */}
+      {}
       <div className="fixed bottom-0 left-0 right-0 p-4 sm:p-6 flex justify-center bg-gradient-to-t from-[color:var(--color-paper)] via-[color:var(--color-paper)] to-transparent pointer-events-none pb-8">
         <Link href="/" className="pointer-events-auto">
           <button className="press group inline-flex items-center gap-3 border border-[color:var(--color-ink)] bg-[color:var(--color-ink)] px-6 py-3.5 text-[color:var(--color-paper)] hover:bg-[color:var(--color-burgundy)] hover:border-[color:var(--color-burgundy)]">

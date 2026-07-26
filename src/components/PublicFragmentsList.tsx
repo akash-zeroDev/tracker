@@ -1,13 +1,10 @@
 'use client';
-
 import React, { useState } from 'react';
 import { RefId } from '@/components/AtelierPrimitives';
 import { EditorialTime } from '@/components/ui/EditorialTime';
-
 export function PublicFragmentsList({ entries }: { entries: any[] }) {
   const [expanded, setExpanded] = useState(false);
   const displayedEntries = expanded ? entries : entries.slice(0, 5);
-
   if (entries.length === 0) {
     return (
       <article>
@@ -18,7 +15,6 @@ export function PublicFragmentsList({ entries }: { entries: any[] }) {
       </article>
     );
   }
-
   return (
     <div className="flex flex-col gap-10">
       {displayedEntries.map((entry, index) => (
@@ -32,7 +28,6 @@ export function PublicFragmentsList({ entries }: { entries: any[] }) {
           </h3>
         </article>
       ))}
-
       {entries.length > 5 && (
         <div className="mt-2 flex items-center justify-between border-t border-[color:var(--color-rule)] pt-6">
           <span className="ref-id">showing {displayedEntries.length} of {entries.length}</span>

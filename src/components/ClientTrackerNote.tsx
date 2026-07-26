@@ -1,21 +1,17 @@
 'use client';
-
 import React, { useEffect, useState } from 'react';
 import { useTrackers } from '@/hooks/useTrackers';
 import { getGoalById } from '@/app/actions';
 import { Label, RefId } from '@/components/AtelierPrimitives';
 import Link from 'next/link';
-
 type GoalData = {
   title: string;
   entries: { id: string; content: string | null; createdAt: Date }[];
 };
-
 function getRomanMonth(monthIndex: number) {
   const numerals = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
   return numerals[monthIndex];
 }
-
 function formatAestheticDate(date: Date) {
   const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   const dayName = days[date.getDay()];
@@ -23,11 +19,9 @@ function formatAestheticDate(date: Date) {
   const romanMonth = getRomanMonth(date.getMonth());
   return `${dayName} · ${dateNum}.${romanMonth}`;
 }
-
 export function ClientTrackerNote() {
   const { trackers, isLoaded } = useTrackers();
   const [goal, setGoal] = useState<GoalData | null>(null);
-
   useEffect(() => {
     if (isLoaded && trackers.length > 0) {
       const latest = trackers[0];
@@ -41,8 +35,6 @@ export function ClientTrackerNote() {
       });
     }
   }, [isLoaded, trackers]);
-
-  // If loading or no trackers, show the default static dummy note (as before)
   if (!isLoaded || trackers.length === 0 || !goal) {
     return (
       <div className="tracing-paper paper-lift relative p-7 flex flex-col justify-center min-h-[300px]">
@@ -50,7 +42,6 @@ export function ClientTrackerNote() {
           <RefId>№ 004.128 · STATUS</RefId>
           <Label>{formatAestheticDate(new Date())}</Label>
         </div>
-        
         <div className="text-center mt-8 mb-4">
           <h3 className="font-serif text-[1.4rem] leading-[1.35] text-[color:var(--color-ink)] mb-3">
             No folio <span className="italic">selected</span>.
@@ -62,16 +53,13 @@ export function ClientTrackerNote() {
       </div>
     );
   }
-
   const latestEntry = goal.entries[0];
   const dateStr = latestEntry 
     ? formatAestheticDate(new Date(latestEntry.createdAt))
     : 'No entries';
-    
   const timeStr = latestEntry
     ? new Date(latestEntry.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     : '--:--';
-
   return (
     <div className="tracing-paper paper-lift relative p-7">
       <div className="flex items-center justify-between">
