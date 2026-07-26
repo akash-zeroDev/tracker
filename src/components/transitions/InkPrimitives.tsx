@@ -28,7 +28,7 @@ export function InkRegion({ children, priority = 2, className = '' }: InkRegionP
 const INCOMING_DELAYS = [0, 0.04, 0.08, 0.12, 0.16];
 const OUTGOING_DELAYS = [0.16, 0.12, 0.08, 0.04, 0];
 // The core ink variants that all primitives inherit
-const inkVariants = {
+const inkVariants: any = {
   initial: {
     opacity: 0,
     filter: 'blur(3px)',
