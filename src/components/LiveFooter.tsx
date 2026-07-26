@@ -1,7 +1,7 @@
 'use client';
 import React, { useRef } from 'react';
 import { ArchivalLink as Link } from '@/components/transitions/ArchivalLink';
-import { motion, useInView, Variants } from 'framer-motion';
+import { motion, useInView } from 'framer-motion';
 import { Label, Stamp, RefId } from '@/components/AtelierPrimitives';
 import { InkRegion } from '@/components/transitions/InkPrimitives';
 import { GITHUB_REPO_URL } from '@/lib/constants';
@@ -10,7 +10,7 @@ export function LiveFooter() {
   const inView = useInView(footerRef, { once: true, margin: "-50px" });
   const currentYear = new Date().getFullYear();
   const romanYear = (num: number) => {
-    const lookup: any = {M:1000,CM:900,D:500,CD:400,C:100,XC:90,L:50,XL:40,X:10,IX:9,V:5,IV:4,I:1};
+    const lookup: Record<string, number> = {M:1000,CM:900,D:500,CD:400,C:100,XC:90,L:50,XL:40,X:10,IX:9,V:5,IV:4,I:1};
     let roman = '';
     for (const i in lookup) {
       while (num >= lookup[i]) {
@@ -27,9 +27,9 @@ export function LiveFooter() {
       transition: { staggerChildren: 0.1, delayChildren: 0.2 }
     }
   };
-  const itemVariants: any = {
+  const itemVariants = {
     hidden: { opacity: 0, y: 10 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] } }
+    visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] as const } }
   };
   return (
     <InkRegion priority={4} className="mt-auto">

@@ -1,8 +1,12 @@
 'use client';
 import React, { useState } from 'react';
-import { RefId } from '@/components/AtelierPrimitives';
 import { EditorialTime } from '@/components/ui/EditorialTime';
-export function PublicFragmentsList({ entries }: { entries: any[] }) {
+interface PublicEntry {
+  id: string;
+  createdAt: string | number | Date;
+  content: string | null;
+}
+export function PublicFragmentsList({ entries }: { entries: PublicEntry[] }) {
   const [expanded, setExpanded] = useState(false);
   const displayedEntries = expanded ? entries : entries.slice(0, 5);
   if (entries.length === 0) {

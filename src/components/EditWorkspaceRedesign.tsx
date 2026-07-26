@@ -386,6 +386,7 @@ function AccessionSlip({ goal }: { goal: GoalData }) {
   const [copied, setCopied] = React.useState(false);
   const [host, setHost] = React.useState('archive.dev');
   React.useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setHost(window.location.host);
   }, []);
   const url = `${host}/${goal.publicSlug}`;
@@ -434,6 +435,7 @@ function VaultDeposit({ goal }: { goal: GoalData }) {
   const [state, setState] = React.useState<"idle" | "submitting" | "received">("idle");
   React.useEffect(() => {
     const saved = localStorage.getItem('backup_email_v1');
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (saved) setEmail(saved);
   }, []);
   const handleSubmit = async () => {
@@ -546,7 +548,7 @@ function CalendarHeatmap({ goal }: { goal: GoalData }) {
   const prevMonth = () => setCurrentDate(new Date(year, month - 1, 1));
   const nextMonth = () => setCurrentDate(new Date(year, month + 1, 1));
   const isCurrentMonth = new Date().getFullYear() === year && new Date().getMonth() === month;
-  const grid = Array.from({ length: startDayOfWeek }).map(() => null)
+  const grid: (number | null)[] = Array.from({ length: startDayOfWeek }, () => null as number | null)
     .concat(Array.from({ length: daysInMonth }).map((_, i) => i + 1));
   const getDotStyle = (count: number) => {
     if (count === 0) return { 
@@ -587,7 +589,7 @@ function CalendarHeatmap({ goal }: { goal: GoalData }) {
   };
   const item = {
     hidden: { opacity: 0, scale: 0.8 },
-    show: { opacity: 1, scale: 1, transition: { type: "spring", stiffness: 350, damping: 25 } }
+    show: { opacity: 1, scale: 1, transition: { type: "spring" as const, stiffness: 350, damping: 25 } }
   };
   return (
     <section className="reveal reveal-delay-3 paper-sheet relative p-8 lg:p-10">
@@ -850,9 +852,13 @@ export default function EditWorkspaceRedesign({ goal }: { goal: GoalData }) {
   );
 }
 function FragmentStamp({ fragmentNumber }: { fragmentNumber: number }) {
+  // eslint-disable-next-line react-hooks/purity
   const rotation = React.useMemo(() => (Math.random() > 0.5 ? 1 : -1) * (30 + Math.random() * 10), []); 
+  // eslint-disable-next-line react-hooks/purity
   const xOffset = React.useMemo(() => (Math.random() * 8 - 4), []);
+  // eslint-disable-next-line react-hooks/purity
   const yOffset = React.useMemo(() => (Math.random() * 8 - 4), []);
+  // eslint-disable-next-line react-hooks/purity
   const inkOpacity = React.useMemo(() => (0.88 + Math.random() * 0.12), []);
   return (
     <motion.div

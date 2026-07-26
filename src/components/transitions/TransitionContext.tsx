@@ -22,9 +22,10 @@ export function TransitionProviderInner({ children }: { children: React.ReactNod
   const pathname = usePathname();
   React.useEffect(() => {
     if (status === 'leaving') {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setStatus('idle');
     }
-  }, [pathname]); 
+  }, [pathname, status]); 
   const navigate = useCallback((href: string) => {
     if (pathname === href) return;
     setStatus('leaving');

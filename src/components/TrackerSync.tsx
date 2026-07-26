@@ -12,6 +12,6 @@ export function TrackerSync({ id, slug, title }: TrackerSyncProps) {
     if (isLoaded) {
       addOrUpdateTracker({ id, slug, title });
     }
-  }, [isLoaded, id, slug, title]);
+  }, [isLoaded, id, slug, title, addOrUpdateTracker]);
   return null; 
 }

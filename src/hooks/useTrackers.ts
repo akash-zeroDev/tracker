@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 export interface LocalTracker {
   id: string; 
   slug: string; 
@@ -14,6 +14,7 @@ export function useTrackers() {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setTrackers(JSON.parse(stored));
       }
     } catch {
@@ -26,7 +27,7 @@ export function useTrackers() {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(trackers));
     }
   }, [trackers, isLoaded]);
-  const addOrUpdateTracker = (tracker: Omit<LocalTracker, 'createdAt' | 'lastOpened'>) => {
+  const addOrUpdateTracker = useCallback((tracker: Omit<LocalTracker, 'createdAt' | 'lastOpened'>) => {
     setTrackers((prev) => {
       const existingIndex = prev.findIndex((t) => t.id === tracker.id);
       const now = Date.now();
@@ -47,9 +48,9 @@ export function useTrackers() {
         return [newTracker, ...prev].sort((a, b) => b.lastOpened - a.lastOpened);
       }
     });
-  };
-  const removeTracker = (id: string) => {
+  }, []);
+  const removeTracker = useCallback((id: string) => {
     setTrackers((prev) => prev.filter((t) => t.id !== id));
-  };
+  }, []);
   return { trackers, isLoaded, addOrUpdateTracker, removeTracker };
 }

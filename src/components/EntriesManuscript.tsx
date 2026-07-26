@@ -38,7 +38,13 @@ function Counter({ to, duration = 1.5 }: { to: number; duration?: number }) {
   }, [inView, to, duration]);
   return <span ref={ref}>0</span>;
 }
-function Section01Stats({ stats }: { stats: any }) {
+interface ArchiveStats {
+  fragmentsCount: number;
+  monthsRecorded: number;
+  maxChain: number;
+  activeSubjects: number;
+}
+function Section01Stats({ stats }: { stats: ArchiveStats }) {
   const containerVariants: import('framer-motion').Variants = {
     hidden: {},
     visible: { transition: { staggerChildren: 0.15 } }
@@ -132,7 +138,12 @@ function ChronicleRow({ entry }: { entry: EntryRow }) {
     </Link>
   );
 }
-function MonthlySummary({ monthName, summary }: { monthName: string, summary: any }) {
+interface MonthSummary {
+  fragments: number;
+  chain: number;
+  mostStudied?: string;
+}
+function MonthlySummary({ monthName, summary }: { monthName: string, summary: MonthSummary }) {
   return (
     <motion.div 
       initial={{ opacity: 0 }}
@@ -159,7 +170,7 @@ function MonthlySummary({ monthName, summary }: { monthName: string, summary: an
   );
 }
 const FILTERS = ["All", "Software Engineering", "Design", "Writing", "Research", "Reading"];
-export function EntriesManuscript({ entries, summaries, archiveStats }: { entries: EntryRow[], summaries: any, archiveStats: any }) {
+export function EntriesManuscript({ entries, summaries, archiveStats }: { entries: EntryRow[], summaries: Record<string, MonthSummary>, archiveStats: ArchiveStats }) {
   const [activeFilter, setActiveFilter] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
   // 1. First filter by search query (across fragment, subject, refId)

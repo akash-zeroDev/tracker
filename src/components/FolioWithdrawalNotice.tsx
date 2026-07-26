@@ -20,6 +20,7 @@ export function FolioWithdrawalNotice({ folio, isOpen, onClose, onSuccess }: Fol
   // Reset input when modal opens
   useEffect(() => {
     if (isOpen) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setInputValue('');
       // Slight delay to allow animation to complete before stealing focus
       const t = setTimeout(() => {

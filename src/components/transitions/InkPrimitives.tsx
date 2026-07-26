@@ -1,6 +1,6 @@
 'use client';
 import React, { createContext, useContext } from 'react';
-import { motion, HTMLMotionProps } from 'framer-motion';
+import { motion, HTMLMotionProps, Variants } from 'framer-motion';
 export type InkPriority = 0 | 1 | 2 | 3 | 4;
 const InkRegionContext = createContext<InkPriority>(2);
 export function useInkRegionPriority() {
@@ -28,7 +28,7 @@ export function InkRegion({ children, priority = 2, className = '' }: InkRegionP
 const INCOMING_DELAYS = [0, 0.04, 0.08, 0.12, 0.16];
 const OUTGOING_DELAYS = [0.16, 0.12, 0.08, 0.04, 0];
 // The core ink variants that all primitives inherit
-const inkVariants: any = {
+const inkVariants: Variants = {
   initial: {
     opacity: 0,
     filter: 'blur(3px)',
@@ -39,7 +39,7 @@ const inkVariants: any = {
     transition: {
       delay: INCOMING_DELAYS[priority] || 0,
       duration: 0.35 + (priority * 0.05),
-      ease: [0.22, 1, 0.36, 1], // easeOut
+      ease: [0.22, 1, 0.36, 1] as const, // easeOut
     },
   }),
   leaving: (priority: number) => ({
@@ -48,10 +48,10 @@ const inkVariants: any = {
     transition: {
       delay: OUTGOING_DELAYS[priority] || 0,
       duration: 0.3 + ((4 - priority) * 0.05),
-      ease: [0.33, 1, 0.68, 1], // easeOutCubic
+      ease: [0.33, 1, 0.68, 1] as const, // easeOutCubic
     },
   }),
-  exit: (priority: number) => ({
+  exit: () => ({
     opacity: 0,
     filter: 'blur(2px)',
     transition: {

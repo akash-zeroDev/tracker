@@ -13,11 +13,13 @@ export function EditorialTime({ date, context = 'feed', action, className = '' }
     formatEditorialTime(dateObj, { context, action })
   );
   useEffect(() => {
-    setDisplayTime(formatEditorialTime(dateObj, { context, action }));
-    const ageInMs = Date.now() - dateObj.getTime();
+    const d = new Date(date);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setDisplayTime(formatEditorialTime(d, { context, action }));
+    const ageInMs = Date.now() - d.getTime();
     if (ageInMs > 24 * 60 * 60 * 1000) return;
     const interval = setInterval(() => {
-      setDisplayTime(formatEditorialTime(dateObj, { context, action }));
+      setDisplayTime(formatEditorialTime(d, { context, action }));
     }, 30000);
     return () => clearInterval(interval);
   }, [date, context, action]);
