@@ -7,8 +7,6 @@ type Kind = "index" | "slip" | "folded" | "tracing" | "bookmark";
 export type Fragment = {
   id: string;
   ref: string;
-  author: string;
-  handle: string;
   goal: string;
   topic: string;
   streak: number;
@@ -81,19 +79,7 @@ function Meta({ f }: { f: Fragment }) {
 }
 function Byline({ f }: { f: Fragment }) {
   return (
-    <div className="flex items-baseline justify-between gap-4">
-      <div>
-        <div className="label-caps">Filed by</div>
-        <div
-          className="font-serif"
-          style={{ fontSize: "1.05rem", lineHeight: 1.2 }}
-        >
-          {f.author}{" "}
-          <span className="ref-id" style={{ marginLeft: 4 }}>
-            {f.handle}
-          </span>
-        </div>
-      </div>
+    <div className="flex items-baseline justify-end gap-4">
       <StreakGlyph n={f.streak} />
     </div>
   );
@@ -205,9 +191,6 @@ function PaperSlipNote({ f }: { f: Fragment }) {
       <hr className="fold-line" style={{ margin: "10px 0" }} />
       <div className="flex items-center justify-between">
         <div>
-          <div className="font-serif" style={{ fontSize: "0.98rem" }}>
-            {f.author}
-          </div>
           <div className="ref-id">{f.goal}</div>
         </div>
         <StreakGlyph n={f.streak} />
@@ -294,8 +277,7 @@ function TracingNote({ f }: { f: Fragment }) {
         {f.fragment}
       </p>
       <Meta f={f} />
-      <div className="flex items-center justify-between" style={{ marginTop: 8 }}>
-        <span className="ref-id">— {f.author}</span>
+      <div className="flex items-center justify-end" style={{ marginTop: 8 }}>
         <StreakGlyph n={f.streak} />
       </div>
       <div style={{ marginTop: 10 }}>
@@ -400,8 +382,6 @@ export default function CommunityPinboard() {
     return {
       id: goal.id,
       ref: `PA-${goal.id.split('-')[0].substring(0, 4)}`,
-      author: "Folio Author", 
-      handle: `@writer`,
       goal: goal.title,
       topic: goal.title.split(' ')[0] || "Topic",
       streak: goal.currentStreak,
