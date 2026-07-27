@@ -1,7 +1,6 @@
 'use client';
 import * as React from "react";
-import { getCommunityFeedByIds } from '@/app/actions';
-import { useTrackers } from '@/hooks/useTrackers';
+import { getCommunityFeed } from '@/app/actions';
 import Link from 'next/link';
 import { EditorialTime } from '@/components/ui/EditorialTime';
 type Kind = "index" | "slip" | "folded" | "tracing" | "bookmark";
@@ -365,26 +364,17 @@ function Note({ f, featured }: { f: Fragment; featured?: boolean }) {
   }
 }
 export default function CommunityPinboard() {
-  const { trackers, isLoaded } = useTrackers();
   const [dbGoals, setDbGoals] = React.useState<any[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
 
   React.useEffect(() => {
-    if (isLoaded) {
-      const ids = trackers.map(t => t.id);
-      if (ids.length > 0) {
-        getCommunityFeedByIds(ids, 6).then(data => {
-          setDbGoals(data);
-          setIsLoading(false);
-        });
-      } else {
-        setDbGoals([]);
-        setIsLoading(false);
-      }
-    }
-  }, [trackers, isLoaded]);
+    getCommunityFeed(6).then(data => {
+      setDbGoals(data);
+      setIsLoading(false);
+    });
+  }, []);
 
-  if (isLoading || !isLoaded) {
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
         <p className="font-serif italic text-[color:var(--color-ink-soft)]">Loading pinboard...</p>
@@ -410,8 +400,8 @@ export default function CommunityPinboard() {
     return {
       id: goal.id,
       ref: `PA-${goal.id.split('-')[0].substring(0, 4)}`,
-      author: "Local Folio", 
-      handle: `@local`,
+      author: "Folio Author", 
+      handle: `@writer`,
       goal: goal.title,
       topic: goal.title.split(' ')[0] || "Topic",
       streak: goal.currentStreak,
@@ -443,7 +433,7 @@ export default function CommunityPinboard() {
           }}
         >
           <div>
-            <div className="label-caps">Section vii — Your Board</div>
+            <div className="label-caps">Section vii — community</div>
             <h2
               id="community-pinboard-heading"
               className="font-serif"
@@ -454,7 +444,7 @@ export default function CommunityPinboard() {
                 maxWidth: 720,
               }}
             >
-              What you are quietly learning.
+              What thoughtful people are quietly learning.
             </h2>
             <p
               style={{
@@ -464,7 +454,7 @@ export default function CommunityPinboard() {
                 lineHeight: 1.7,
               }}
             >
-              Fragments pinned to your local board — small
+              Fragments pinned to the shared board this week — small
               pieces of larger, patient projects filed in the open.
             </p>
           </div>
@@ -581,7 +571,7 @@ export default function CommunityPinboard() {
               lineHeight: 1.55,
             }}
           >
-            “A personal workspace of learning — filed carefully,
+            “A shared workspace of people learning together — filed carefully,
             read slowly.”
           </p>
         </div>

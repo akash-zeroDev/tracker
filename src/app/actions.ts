@@ -208,9 +208,10 @@ export async function getArchivedGoalsByIds(ids: string[]) {
     }
   });
 }
-export async function getCommunityFeed(limit: number = 3) {
+export async function getCommunityFeed(limit: number = 6) {
   return await prisma.goal.findMany({
-    orderBy: { createdAt: 'desc' },
+    where: { isPublic: true },
+    orderBy: { currentStreak: 'desc' },
     take: limit,
     include: {
       entries: {
