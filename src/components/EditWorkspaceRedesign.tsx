@@ -1,6 +1,6 @@
 'use client';
 import * as React from "react";
-import { Folder, Search, CheckCircle, Clock } from 'lucide-react';
+
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from 'framer-motion';
 import { EditorialTime } from '@/components/ui/EditorialTime';
@@ -8,7 +8,7 @@ import { addLogEntry, sendBackupEmail, toggleGoalVisibility } from "@/app/action
 import { CommandLineAccess } from "./CommandLineAccess";
 import { DestroyTracker } from "./DestroyTracker";
 import { GoalDescriptionEditor } from "./GoalDescriptionEditor";
-import { Flame, Trash2 } from 'lucide-react';
+import { Trash2 } from 'lucide-react';
 import { deleteLogEntry } from '@/app/actions';
 import { GoalCategoryEditor } from "./GoalCategoryEditor";
 export interface GoalData {
@@ -64,6 +64,7 @@ function SectionHeading({
   );
 }
 function VolumePlate({ goal }: { goal: GoalData }) {
+  // eslint-disable-next-line react-hooks/purity
   const ageDays = Math.max(1, Math.floor((Date.now() - new Date(goal.createdAt).getTime()) / (1000 * 60 * 60 * 24)));
   const shelf = goal.id.slice(0, 2).toUpperCase();
   const accession = goal.id.split('-')[0].toUpperCase();

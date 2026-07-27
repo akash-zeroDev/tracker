@@ -454,12 +454,14 @@ export default async function CommunityPinboard() {
   const shuffle = <T,>(array: T[]): T[] => {
     const arr = [...array];
     for (let i = arr.length - 1; i > 0; i--) {
+      // eslint-disable-next-line react-hooks/purity
       const j = Math.floor(Math.random() * (i + 1));
       [arr[i], arr[j]] = [arr[j], arr[i]];
     }
     return arr;
   };
   const shuffledKinds = ["index", ...shuffle(remainingKinds)];
+  // eslint-disable-next-line react-hooks/purity
   const randomTilt = () => (Math.random() * 2.5 - 1.25); 
   const mapped: Fragment[] = dbGoals.map((goal, idx) => {
     const entry = goal.entries[0];

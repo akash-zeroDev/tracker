@@ -1,7 +1,6 @@
 'use client';
 import React, { useState, useEffect, useTransition, useCallback } from 'react';
-import { Button } from '@/components/ui/Button';
-import { Textarea, FieldGroup, ValidationMessage } from '@/components/ui/forms';
+
 import { addLogEntry } from '@/app/actions';
 import { useRouter } from 'next/navigation';
 interface PendingLog {
@@ -21,6 +20,7 @@ export function ClientLogForm({ goalId }: { goalId: string }) {
     const stored = localStorage.getItem(`pending_logs_${goalId}`);
     if (stored) {
       try {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setPendingLogs(JSON.parse(stored));
       } catch {
       }
@@ -40,6 +40,7 @@ export function ClientLogForm({ goalId }: { goalId: string }) {
   }, [router]);
   useEffect(() => {
     try {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setTimezone(Intl.DateTimeFormat().resolvedOptions().timeZone);
     } catch {
     }

@@ -169,6 +169,24 @@ export async function getRecentGoals(limit: number = 3) {
     }
   });
 }
+export async function getGoalsByIds(ids: string[]) {
+  if (!ids || ids.length === 0) return [];
+  
+  const goals = await prisma.goal.findMany({
+    where: {
+      id: { in: ids },
+      status: 'ACTIVE'
+    },
+    include: {
+      entries: {
+        orderBy: { createdAt: 'desc' }
+      }
+    }
+  });
+  
+  // Sort them to match the order of IDs in localStorage
+  return goals.sort((a, b) => ids.indexOf(a.id) - ids.indexOf(b.id));
+}
 export async function getArchivedGoals() {
   return await prisma.goal.findMany({
     where: { status: 'ARCHIVED' },

@@ -1,25 +1,39 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { getRecentGoals, archiveGoal } from '@/app/actions';
+import { getGoalsByIds, archiveGoal } from '@/app/actions';
 import { Label, RefId, MarginNote } from '@/components/AtelierPrimitives';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useTrackers } from '@/hooks/useTrackers';
+
 export function ActiveFoliosList() {
   const [goals, setGoals] = useState<any[]>([]);
   const [archivingId, setArchivingId] = useState<string | null>(null);
   const router = useRouter();
+  const { trackers, isLoaded, removeTracker } = useTrackers();
+
   useEffect(() => {
-    getRecentGoals(3).then(setGoals);
-  }, []);
+    if (isLoaded) {
+      const ids = trackers.slice(0, 3).map(t => t.id);
+      if (ids.length > 0) {
+        getGoalsByIds(ids).then(setGoals);
+      } else {
+        setGoals([]);
+      }
+    }
+  }, [trackers, isLoaded]);
+
   const handleArchiveClick = (e: React.MouseEvent, id: string) => {
     e.preventDefault();
     setArchivingId(id);
   };
+
   const confirmArchive = async () => {
     if (!archivingId) return;
     const idToArchive = archivingId;
     setGoals(goals.filter(g => g.id !== idToArchive));
     setArchivingId(null);
+    removeTracker(idToArchive);
     await archiveGoal(idToArchive);
     router.refresh();
   };

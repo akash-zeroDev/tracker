@@ -1,15 +1,30 @@
-import React from 'react';
-import { getRecentGoals } from '@/app/actions';
+'use client';
+import React, { useState, useEffect } from 'react';
+import { getGoalsByIds } from '@/app/actions';
 import { ArchivalLink as Link } from '@/components/transitions/ArchivalLink';
 import { Label, RefId, SectionHeading, FoldRule } from '@/components/AtelierPrimitives';
 import { format } from 'date-fns';
 import { InkRegion } from '@/components/transitions/InkPrimitives';
-export default async function DeskPage() {
-  const activeFolios = await getRecentGoals(10);
+import { useTrackers } from '@/hooks/useTrackers';
+
+export default function DeskPage() {
+  const [activeFolios, setActiveFolios] = useState<any[]>([]);
+  const { trackers, isLoaded } = useTrackers();
+
+  useEffect(() => {
+    if (isLoaded) {
+      const ids = trackers.slice(0, 10).map(t => t.id);
+      if (ids.length > 0) {
+        getGoalsByIds(ids).then(setActiveFolios);
+      } else {
+        setActiveFolios([]);
+      }
+    }
+  }, [trackers, isLoaded]);
+
   return (
     <main className="min-h-screen text-[color:var(--color-ink)] pb-32">
       <div className="mx-auto max-w-[1360px] px-6 lg:px-12 pt-16">
-        {}
         <InkRegion priority={1}>
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16">
           <div className="max-w-[34ch]">
@@ -33,9 +48,14 @@ export default async function DeskPage() {
         <InkRegion priority={3}>
           <FoldRule className="mb-16" />
         </InkRegion>
-        {}
         <InkRegion priority={2}>
-          {activeFolios.length === 0 ? (
+          {!isLoaded ? (
+            <div className="py-32 text-center">
+              <p className="font-serif italic text-[color:var(--color-ink-soft)]">
+                Loading desk...
+              </p>
+            </div>
+          ) : activeFolios.length === 0 ? (
           <div className="py-32 text-center">
             <h2 className="font-serif text-[2rem] italic text-[color:var(--color-ink-soft)]">
               The desk is completely clear.
@@ -52,13 +72,11 @@ export default async function DeskPage() {
               return (
                 <Link key={goal.id} href={`/edit/${goal.id}`} className="group block outline-none">
                   <div className="relative pt-6 transition-transform duration-300 group-hover:-translate-y-1">
-                    {}
                     <div className="absolute top-[2px] left-0 bg-[color:var(--color-paper)] border border-b-0 border-[color:var(--color-rule)] px-4 py-1.5 rounded-t-sm z-30 transition-colors group-hover:bg-[color:var(--color-ink)] group-hover:text-[color:var(--color-paper)] group-hover:border-[color:var(--color-ink)]">
                       <span className="font-mono text-[9px] tracking-[0.2em] uppercase">
                         {goal.category || 'Uncategorized'}
                       </span>
                     </div>
-                    {}
                     <div className="paper-sheet p-6 h-full min-h-[320px] flex flex-col justify-between shadow-sm transition-all duration-300 group-hover:shadow-md relative z-20 bg-[color:var(--color-paper)] border-[color:var(--color-rule)] group-hover:border-[color:var(--color-ink-soft)]">
                       <div>
                         <div className="flex justify-between items-start mb-6">
@@ -76,7 +94,6 @@ export default async function DeskPage() {
                           {goal.description || 'No description provided.'}
                         </p>
                       </div>
-                      {}
                       {latestEntry ? (
                         <div className="mt-8 border-t border-dashed border-[color:var(--color-rule)] pt-4 relative">
                           <div className="absolute -top-[1px] left-0 w-8 h-[1px] bg-[color:var(--color-ink)] opacity-0 group-hover:opacity-100 transition-opacity" />

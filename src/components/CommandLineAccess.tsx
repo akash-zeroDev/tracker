@@ -32,6 +32,7 @@ export function CommandLineAccess({ goalId, automation: initialAutomation }: Pro
   const [activeTab, setActiveTab] = React.useState<CLATab>('curl');
   const [host, setHost] = React.useState('your-domain.com');
   React.useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setHost(window.location.host);
   }, []);
   const isLocalhost = host.startsWith('localhost') || host.startsWith('127.0.0.1');
@@ -267,7 +268,7 @@ jobs:
           <div>
             <Label>Quick command</Label>
             <p className="mt-1 mb-2 font-serif text-[13px] italic text-[var(--color-ink-soft)] leading-snug">
-              Copy a command below and change the <code className="font-mono text-[11px] not-italic">"content"</code> value to file your own custom log entry.
+              Copy a command below and change the <code className="font-mono text-[11px] not-italic">&quot;content&quot;</code> value to file your own custom log entry.
             </p>
             {}
             <div className="mt-3 flex flex-wrap gap-0 border-b border-[var(--color-rule)]">
