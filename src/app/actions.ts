@@ -196,6 +196,19 @@ export async function getArchivedGoals() {
     }
   });
 }
+export async function getArchivedGoalsByIds(ids: string[]) {
+  if (!ids || ids.length === 0) return [];
+  return await prisma.goal.findMany({
+    where: { 
+      status: 'ARCHIVED',
+      id: { in: ids }
+    },
+    orderBy: { createdAt: 'desc' },
+    include: {
+      entries: true
+    }
+  });
+}
 export async function getCommunityFeed(limit: number = 3) {
   return await prisma.goal.findMany({
     orderBy: { createdAt: 'desc' },
@@ -220,6 +233,29 @@ export async function getArchiveStats() {
     where: { status: 'ACTIVE' }
   });
   const subjectsCount = await prisma.goal.count();
+  return {
+    fragmentsCount,
+    longestChain,
+    activeFoliosCount,
+    subjectsCount,
+  };
+}
+export async function getArchiveStatsByIds(ids: string[]) {
+  if (!ids || ids.length === 0) {
+    return { fragmentsCount: 0, longestChain: 0, activeFoliosCount: 0, subjectsCount: 0 };
+  }
+  const fragmentsCount = await prisma.logEntry.count({
+    where: { goalId: { in: ids } }
+  });
+  const maxStreakResult = await prisma.goal.aggregate({
+    where: { id: { in: ids } },
+    _max: { longestStreak: true }
+  });
+  const longestChain = maxStreakResult._max.longestStreak || 0;
+  const activeFoliosCount = await prisma.goal.count({
+    where: { id: { in: ids }, status: 'ACTIVE' }
+  });
+  const subjectsCount = ids.length;
   return {
     fragmentsCount,
     longestChain,
@@ -264,6 +300,19 @@ export async function updateGoalCategory(id: string, category: string) {
 }
 export async function getAllEntries() {
   return await prisma.logEntry.findMany({
+    include: {
+      goal: true
+    },
+    orderBy: {
+      createdAt: 'desc'
+    }
+  });
+}
+
+export async function getEntriesByGoalIds(ids: string[]) {
+  if (!ids || ids.length === 0) return [];
+  return await prisma.logEntry.findMany({
+    where: { goalId: { in: ids } },
     include: {
       goal: true
     },

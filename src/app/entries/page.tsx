@@ -1,8 +1,12 @@
-import React from 'react';
+'use client';
+
+import React, { useEffect, useState } from 'react';
 import { EntriesManuscript } from '@/components/EntriesManuscript';
-import { getAllEntries } from '@/app/actions';
+import { getEntriesByGoalIds } from '@/app/actions';
 import { format } from 'date-fns';
 import { InkRegion } from '@/components/transitions/InkPrimitives';
+import { useTrackers } from '@/hooks/useTrackers';
+
 function getCalendarDayDifference(previousDate: Date | null, currentDate: Date): number {
   if (!previousDate) return Infinity;
   const prevStr = previousDate.toISOString().split('T')[0];
@@ -12,15 +16,42 @@ function getCalendarDayDifference(previousDate: Date | null, currentDate: Date):
   const diffTime = Math.abs(curr - prev);
   return Math.floor(diffTime / (1000 * 60 * 60 * 24));
 }
-export default async function EntriesPage() {
-  const allEntries = await getAllEntries();
+
+export default function EntriesPage() {
+  const { trackers, isLoaded } = useTrackers();
+  const [allEntries, setAllEntries] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    if (isLoaded) {
+      const ids = trackers.map(t => t.id);
+      if (ids.length > 0) {
+        getEntriesByGoalIds(ids).then(entries => {
+          setAllEntries(entries);
+          setIsLoading(false);
+        });
+      } else {
+        setAllEntries([]);
+        setIsLoading(false);
+      }
+    }
+  }, [trackers, isLoaded]);
+
+  if (isLoading || !isLoaded) {
+    return (
+      <main className="min-h-screen text-[color:var(--color-ink)] pb-32 flex items-center justify-center">
+        <p className="font-serif italic text-[color:var(--color-ink-soft)]">Loading entries...</p>
+      </main>
+    );
+  }
+
   const entriesByGoal: Record<string, typeof allEntries> = {};
   allEntries.forEach(entry => {
     if (!entriesByGoal[entry.goalId]) entriesByGoal[entry.goalId] = [];
     entriesByGoal[entry.goalId].push(entry);
   });
   Object.values(entriesByGoal).forEach(list => {
-    list.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+    list.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
   });
   const finalRows: any[] = [];
   const monthlyStats: Record<string, { fragments: number, chain: number, mostStudied: string, counts: Record<string, number> }> = {};
@@ -31,7 +62,7 @@ export default async function EntriesPage() {
     goalEntries.forEach((entry, idx) => {
       let specialType = "normal";
       const prevEntry = idx > 0 ? goalEntries[idx - 1] : null;
-      const dayDiff = getCalendarDayDifference(prevEntry?.createdAt || null, entry.createdAt);
+      const dayDiff = getCalendarDayDifference(prevEntry ? new Date(prevEntry.createdAt) : null, new Date(entry.createdAt));
       if (dayDiff === 0) {
       } else if (dayDiff === 1) {
         currentStreak += 1;
@@ -64,7 +95,7 @@ export default async function EntriesPage() {
       }
       const words = (entry.content || "").split(" ").length;
       const readingTime = Math.max(1, Math.ceil(words / 200)) + " min";
-      const monthId = format(entry.createdAt, 'yyyy-MM');
+      const monthId = format(new Date(entry.createdAt), 'yyyy-MM');
       if (!monthlyStats[monthId]) {
         monthlyStats[monthId] = { fragments: 0, chain: 0, mostStudied: "", counts: {} };
       }
@@ -75,8 +106,8 @@ export default async function EntriesPage() {
       finalRows.push({
         id: entry.id,
         goalId: entry.goalId,
-        dateStr: entry.createdAt.toISOString(),
-        displayDate: format(entry.createdAt, 'dd MMM'),
+        dateStr: new Date(entry.createdAt).toISOString(),
+        displayDate: format(new Date(entry.createdAt), 'dd MMM'),
         fragment: entry.content || "Empty record.",
         readingTime,
         subject: entry.goal.title,
@@ -84,9 +115,9 @@ export default async function EntriesPage() {
         refId: `PA-${entry.goalId.split('-')[0].substring(0, 4).toUpperCase()}`,
         specialType,
         monthId,
-        year: format(entry.createdAt, 'yyyy'),
-        monthName: format(entry.createdAt, 'MMMM').toUpperCase(),
-        timestamp: entry.createdAt.getTime()
+        year: format(new Date(entry.createdAt), 'yyyy'),
+        monthName: format(new Date(entry.createdAt), 'MMMM').toUpperCase(),
+        timestamp: new Date(entry.createdAt).getTime()
       });
     });
   });
@@ -101,13 +132,11 @@ export default async function EntriesPage() {
     }
     stat.mostStudied = top;
   });
-  // Sort completely by timestamp desc
   finalRows.sort((a, b) => b.timestamp - a.timestamp);
   const archiveStats = {
     fragmentsCount: allEntries.length,
     monthsRecorded: Object.keys(monthlyStats).length,
     activeSubjects: new Set(allEntries.map(e => e.goalId)).size,
-    // Finding max streak overall for the header stat
     maxChain: Object.values(monthlyStats).reduce((max, m) => Math.max(max, m.chain), 0)
   };
   return (

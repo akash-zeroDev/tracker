@@ -1,4 +1,5 @@
-import React from 'react';
+'use client';
+import React, { useEffect, useState } from 'react';
 import { ArchiveManifest } from './ArchiveManifest';
 import { getArchiveStats } from '@/app/actions';
 import { InkText, InkBlock, InkRule } from './transitions/InkPrimitives';
@@ -62,8 +63,34 @@ export function ReferenceSnippet({
     </figure>
   );
 }
-export async function ComponentAtlas() {
-  const stats = await getArchiveStats();
+import { getArchiveStatsByIds } from '@/app/actions';
+import { useTrackers } from '@/hooks/useTrackers';
+
+export function ComponentAtlas() {
+  const { trackers, isLoaded } = useTrackers();
+  const [stats, setStats] = useState({
+    fragmentsCount: 0,
+    longestChain: 0,
+    activeFoliosCount: 0,
+    subjectsCount: 0
+  });
+
+  useEffect(() => {
+    if (isLoaded) {
+      const ids = trackers.map(t => t.id);
+      if (ids.length > 0) {
+        getArchiveStatsByIds(ids).then(setStats);
+      } else {
+        setStats({
+          fragmentsCount: 0,
+          longestChain: 0,
+          activeFoliosCount: 0,
+          subjectsCount: 0
+        });
+      }
+    }
+  }, [trackers, isLoaded]);
+
   return (
     <section className="mx-auto max-w-[1180px] px-8 py-32">
       <div className="flex items-end justify-between mb-8">
