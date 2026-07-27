@@ -4,7 +4,6 @@ import { formatInTimeZone } from 'date-fns-tz';
 import nodemailer from 'nodemailer';
 import { z } from 'zod';
 import { revalidatePath } from 'next/cache';
-import DOMPurify from 'isomorphic-dompurify';
 import prisma from '@/lib/prisma';
 function generateSlug(title: string) {
   const base = title
@@ -19,7 +18,7 @@ const createGoalSchema = z.object({
 });
 export async function createGoal(title: string) {
   const parsed = createGoalSchema.parse({ title });
-  const validatedTitle = DOMPurify.sanitize(parsed.title.trim());
+  const validatedTitle = parsed.title.trim();
   const publicSlug = generateSlug(title);
   const goal = await prisma.goal.create({
     data: {
@@ -27,7 +26,7 @@ export async function createGoal(title: string) {
       publicSlug,
     },
   });
-  return goal;
+  return { id: goal.id };
 }
 function getCalendarDayDifference(previousDateStr: string | null, currentDateStr: string): number {
   if (!previousDateStr) return Infinity; 
@@ -77,7 +76,7 @@ export async function addLogEntry(goalId: string, content?: string, clientTimezo
     const entry = await tx.logEntry.create({
       data: {
         goalId: parsed.goalId,
-        content: parsed.content ? DOMPurify.sanitize(parsed.content.trim()) : null,
+        content: parsed.content ? parsed.content.trim() : null,
       },
     });
     
@@ -114,7 +113,7 @@ const updateDescriptionSchema = z.object({
 });
 export async function updateGoalDescription(id: string, description: string) {
   const parsed = updateDescriptionSchema.parse({ id, description });
-  const cleanDescription = DOMPurify.sanitize(parsed.description.trim());
+  const cleanDescription = parsed.description.trim();
   await prisma.goal.update({
     where: { id: parsed.id },
     data: { description: cleanDescription || null },
@@ -211,6 +210,21 @@ export async function getArchivedGoalsByIds(ids: string[]) {
 }
 export async function getCommunityFeed(limit: number = 3) {
   return await prisma.goal.findMany({
+    orderBy: { createdAt: 'desc' },
+    take: limit,
+    include: {
+      entries: {
+        orderBy: { createdAt: 'desc' },
+        take: 1
+      }
+    }
+  });
+}
+
+export async function getCommunityFeedByIds(ids: string[], limit: number = 6) {
+  if (!ids || ids.length === 0) return [];
+  return await prisma.goal.findMany({
+    where: { id: { in: ids } },
     orderBy: { createdAt: 'desc' },
     take: limit,
     include: {

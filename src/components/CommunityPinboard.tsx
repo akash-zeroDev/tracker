@@ -1,5 +1,7 @@
+'use client';
 import * as React from "react";
-import { getCommunityFeed } from '@/app/actions';
+import { getCommunityFeedByIds } from '@/app/actions';
+import { useTrackers } from '@/hooks/useTrackers';
 import Link from 'next/link';
 import { EditorialTime } from '@/components/ui/EditorialTime';
 type Kind = "index" | "slip" | "folded" | "tracing" | "bookmark";
@@ -18,93 +20,7 @@ export type Fragment = {
   featured?: boolean;
   publicSlug?: string;
 };
-const MOCK_FRAGMENTS: Fragment[] = [
-  {
-    id: "1",
-    ref: "PA-0421 / vol.iii",
-    author: "Iris Halden",
-    handle: "@iris",
-    goal: "Learning type theory in public",
-    topic: "Type Theory",
-    streak: 48,
-    fragment:
-      "Dependent types collapse the boundary between values and proofs — a function's signature can literally require the caller to have proven something first. Today: the Curry–Howard mirror, held up sideways.",
-    date: "24 Jul 2026",
-    kind: "index",
-    tilt: -0.6,
-    featured: true,
-  },
-  {
-    id: "2",
-    ref: "PA-0388",
-    author: "Marcus Vale",
-    handle: "@mv",
-    goal: "Reading 100 papers on distributed systems",
-    topic: "Consensus",
-    streak: 31,
-    fragment:
-      "Raft doesn't beat Paxos on correctness. It wins on the fact that a person can hold the whole protocol in their head at 11pm.",
-    date: "24 Jul",
-    kind: "slip",
-    tilt: 0.5,
-  },
-  {
-    id: "3",
-    ref: "PA-0102",
-    author: "Sena Okafor",
-    handle: "@sena",
-    goal: "Studying the pigment archives of the 17th c.",
-    topic: "Materials",
-    streak: 12,
-    fragment:
-      "Lead-tin yellow was forgotten for two centuries — not lost to war, lost to a workshop closing without an apprentice.",
-    date: "23 Jul",
-    kind: "folded",
-    tilt: -0.9,
-  },
-  {
-    id: "4",
-    ref: "PA-0257",
-    author: "Jonas Krieger",
-    handle: "@jk",
-    goal: "Reimplementing a small CPython",
-    topic: "Interpreters",
-    streak: 22,
-    fragment:
-      "The GIL is not one lock — it's a social contract between the interpreter and every C extension ever written.",
-    date: "23 Jul",
-    kind: "tracing",
-    tilt: 0.4,
-  },
-  {
-    id: "5",
-    ref: "PA-0511",
-    author: "Amaya Rin",
-    handle: "@amaya",
-    goal: "One woodblock print per week for a year",
-    topic: "Printmaking",
-    streak: 7,
-    fragment:
-      "Registration marks first. Everything else is negotiable.",
-    date: "22 Jul",
-    kind: "bookmark",
-    tilt: -0.5,
-  },
-  {
-    id: "6",
-    ref: "PA-0074",
-    author: "Elena Prieto",
-    handle: "@ep",
-    goal: "Notes on urban cartography",
-    topic: "Cartography",
-    streak: 19,
-    fragment:
-      "A city map is a lie you agree to. The question is which lies you preserve.",
-    date: "22 Jul",
-    kind: "index",
-    tilt: 0.8,
-  },
-];
+
 function Pin({
   className = "",
   style,
@@ -448,8 +364,34 @@ function Note({ f, featured }: { f: Fragment; featured?: boolean }) {
       return <BookmarkNote f={f} />;
   }
 }
-export default async function CommunityPinboard() {
-  const dbGoals = await getCommunityFeed(6);
+export default function CommunityPinboard() {
+  const { trackers, isLoaded } = useTrackers();
+  const [dbGoals, setDbGoals] = React.useState<any[]>([]);
+  const [isLoading, setIsLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    if (isLoaded) {
+      const ids = trackers.map(t => t.id);
+      if (ids.length > 0) {
+        getCommunityFeedByIds(ids, 6).then(data => {
+          setDbGoals(data);
+          setIsLoading(false);
+        });
+      } else {
+        setDbGoals([]);
+        setIsLoading(false);
+      }
+    }
+  }, [trackers, isLoaded]);
+
+  if (isLoading || !isLoaded) {
+    return (
+      <div className="flex items-center justify-center min-h-[50vh]">
+        <p className="font-serif italic text-[color:var(--color-ink-soft)]">Loading pinboard...</p>
+      </div>
+    );
+  }
+
   const remainingKinds: Kind[] = ["slip", "folded", "tracing", "bookmark", "index"];
   const shuffle = <T,>(array: T[]): T[] => {
     const arr = [...array];
@@ -463,30 +405,24 @@ export default async function CommunityPinboard() {
   const shuffledKinds = ["index", ...shuffle(remainingKinds)];
   // eslint-disable-next-line react-hooks/purity
   const randomTilt = () => (Math.random() * 2.5 - 1.25); 
-  const mapped: Fragment[] = dbGoals.map((goal, idx) => {
+  const fragments: Fragment[] = dbGoals.map((goal, idx) => {
     const entry = goal.entries[0];
     return {
       id: goal.id,
       ref: `PA-${goal.id.split('-')[0].substring(0, 4)}`,
-      author: "Folio Author", 
-      handle: `@writer`,
+      author: "Local Folio", 
+      handle: `@local`,
       goal: goal.title,
       topic: goal.title.split(' ')[0] || "Topic",
       streak: goal.currentStreak,
       fragment: entry?.content || "Goal initiated. Awaiting first fragment.",
-      date: <EditorialTime date={goal.createdAt} context="compact" />,
+      date: <EditorialTime date={new Date(goal.createdAt)} context="compact" />,
       kind: shuffledKinds[idx] as Kind,
       tilt: randomTilt(),
       featured: idx === 0,
       publicSlug: goal.publicSlug
     };
   });
-  const mockPadding = MOCK_FRAGMENTS.slice(mapped.length, 6).map((mock, idx) => ({
-    ...mock,
-    kind: shuffledKinds[mapped.length + idx] as Kind,
-    tilt: randomTilt(),
-  }));
-  const fragments = [...mapped, ...mockPadding];
   const [featured, ...rest] = fragments;
   return (
     <section
@@ -507,7 +443,7 @@ export default async function CommunityPinboard() {
           }}
         >
           <div>
-            <div className="label-caps">Section vii — community</div>
+            <div className="label-caps">Section vii — Your Board</div>
             <h2
               id="community-pinboard-heading"
               className="font-serif"
@@ -518,7 +454,7 @@ export default async function CommunityPinboard() {
                 maxWidth: 720,
               }}
             >
-              What thoughtful people are quietly learning.
+              What you are quietly learning.
             </h2>
             <p
               style={{
@@ -528,7 +464,7 @@ export default async function CommunityPinboard() {
                 lineHeight: 1.7,
               }}
             >
-              Fragments pinned to the shared board this week — small
+              Fragments pinned to your local board — small
               pieces of larger, patient projects filed in the open.
             </p>
           </div>
@@ -571,40 +507,57 @@ export default async function CommunityPinboard() {
           {}
           <div className="grid gap-8 lg:gap-10 lg:grid-cols-12">
             {}
-            <div
-              className="reveal lg:col-span-7"
-              style={{ animationDelay: "60ms" }}
-            >
-              <Note f={featured} featured />
-            </div>
+            {featured && (
+              <div
+                className="reveal lg:col-span-7"
+                style={{ animationDelay: "60ms" }}
+              >
+                <Note f={featured} featured />
+              </div>
+            )}
             {}
             <div className="lg:col-span-5 flex flex-col gap-8">
-              <div className="reveal" style={{ animationDelay: "140ms" }}>
-                <Note f={rest[0]} />
-              </div>
-              <div
-                className="reveal"
-                style={{ animationDelay: "220ms", marginLeft: "clamp(0px, 4%, 32px)" }}
-              >
-                <Note f={rest[1]} />
-              </div>
+              {rest[0] && (
+                <div className="reveal" style={{ animationDelay: "140ms" }}>
+                  <Note f={rest[0]} />
+                </div>
+              )}
+              {rest[1] && (
+                <div
+                  className="reveal"
+                  style={{ animationDelay: "220ms", marginLeft: "clamp(0px, 4%, 32px)" }}
+                >
+                  <Note f={rest[1]} />
+                </div>
+              )}
             </div>
             {}
             <div className="lg:col-span-12 grid gap-8 md:grid-cols-3 mt-2">
-              <div className="reveal" style={{ animationDelay: "300ms" }}>
-                <Note f={rest[2]} />
-              </div>
-              <div
-                className="reveal"
-                style={{ animationDelay: "360ms", marginTop: "clamp(0px, 2vw, 24px)" }}
-              >
-                <Note f={rest[3]} />
-              </div>
-              <div className="reveal" style={{ animationDelay: "420ms" }}>
-                <Note f={rest[4]} />
-              </div>
+              {rest[2] && (
+                <div className="reveal" style={{ animationDelay: "300ms" }}>
+                  <Note f={rest[2]} />
+                </div>
+              )}
+              {rest[3] && (
+                <div
+                  className="reveal"
+                  style={{ animationDelay: "360ms", marginTop: "clamp(0px, 2vw, 24px)" }}
+                >
+                  <Note f={rest[3]} />
+                </div>
+              )}
+              {rest[4] && (
+                <div className="reveal" style={{ animationDelay: "420ms" }}>
+                  <Note f={rest[4]} />
+                </div>
+              )}
             </div>
           </div>
+          {fragments.length === 0 && (
+             <div className="text-center py-20 opacity-50 font-serif italic">
+               No fragments filed yet. Start tracking a folio to see it pinned here.
+             </div>
+          )}
         </div>
         {}
         <div
@@ -628,7 +581,7 @@ export default async function CommunityPinboard() {
               lineHeight: 1.55,
             }}
           >
-            “A shared workspace of people learning together — filed carefully,
+            “A personal workspace of learning — filed carefully,
             read slowly.”
           </p>
         </div>
